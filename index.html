@@ -63,8 +63,8 @@
         
         /* Sliders */
         .slider-row { display: flex; align-items: center; gap: 6px; }
-        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 80px; }
-        .pcf-display { display: inline-block; width: 32px; font-weight: 600; color: var(--primary); text-align: right; font-size: 13px; }
+        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 110px; } /* 加长了滑动条 */
+        .pcf-display { display: inline-block; width: 38px; font-weight: 600; color: var(--primary); text-align: right; font-size: 13px; }
         
         .divider { width: 1px; height: 20px; background-color: var(--border-color); margin: 0 4px; }
 
@@ -180,7 +180,7 @@
                     <div class="slider-row">
                         <span class="control-label">Max</span>
                         <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
-                        <span class="pcf-display" id="pcfMaxValue">1.50</span>
+                        <span class="pcf-display" id="pcfMaxValue">1.50+</span>
                     </div>
                 </div>
 
@@ -404,29 +404,34 @@
         }
 
         function setupEventListeners() {
-            
-            // Filters
+            const pcfMinSlider = document.getElementById('pcfMin');
+            const pcfMaxSlider = document.getElementById('pcfMax');
+            const pcfMinValDisplay = document.getElementById('pcfMinValue');
+            const pcfMaxValDisplay = document.getElementById('pcfMaxValue');
+
             document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            document.getElementById('pcfMin').addEventListener('input', function() {
-                let minVal = parseFloat(this.value);
-                let maxVal = parseFloat(document.getElementById('pcfMax').value);
-                if (minVal > maxVal) document.getElementById('pcfMax').value = minVal;
+            // ========== 核心卡顿修复：拖动时只更新数字，松开时才重绘地图 ==========
+            pcfMinSlider.addEventListener('input', function() {
+                if (parseFloat(this.value) > parseFloat(pcfMaxSlider.value)) pcfMaxSlider.value = this.value;
+                pcfMinValDisplay.textContent = parseFloat(this.value).toFixed(2);
                 
-                document.getElementById('pcfMinValue').textContent = parseFloat(document.getElementById('pcfMin').value).toFixed(2);
-                document.getElementById('pcfMaxValue').textContent = parseFloat(document.getElementById('pcfMax').value).toFixed(2);
-                renderApplication();
+                let maxDisplay = parseFloat(pcfMaxSlider.value).toFixed(2);
+                pcfMaxValDisplay.textContent = (maxDisplay === "1.50") ? "1.50+" : maxDisplay;
             });
             
-            document.getElementById('pcfMax').addEventListener('input', function() {
-                let maxVal = parseFloat(this.value);
-                let minVal = parseFloat(document.getElementById('pcfMin').value);
-                if (maxVal < minVal) document.getElementById('pcfMin').value = maxVal;
+            pcfMaxSlider.addEventListener('input', function() {
+                if (parseFloat(this.value) < parseFloat(pcfMinSlider.value)) pcfMinSlider.value = this.value;
+                pcfMinValDisplay.textContent = parseFloat(pcfMinSlider.value).toFixed(2);
                 
-                document.getElementById('pcfMinValue').textContent = parseFloat(document.getElementById('pcfMin').value).toFixed(2);
-                document.getElementById('pcfMaxValue').textContent = parseFloat(document.getElementById('pcfMax').value).toFixed(2);
-                renderApplication();
+                let maxDisplay = parseFloat(this.value).toFixed(2);
+                pcfMaxValDisplay.textContent = (maxDisplay === "1.50") ? "1.50+" : maxDisplay;
             });
+
+            // 当滑块拖动结束松手时，才触发数据刷新，彻底解决卡顿！
+            pcfMinSlider.addEventListener('change', renderApplication);
+            pcfMaxSlider.addEventListener('change', renderApplication);
+
 
             // Summary Panel Collapse Toggle
             document.getElementById('summaryHeader').addEventListener('click', function() {
@@ -440,15 +445,13 @@
 
             // Reset Button
             document.getElementById('resetBtn').addEventListener('click', function() {
-                // Reset Filters
                 document.getElementById('speciesFilter').value = 'ALL';
-                document.getElementById('pcfMin').value = '0.00';
-                document.getElementById('pcfMax').value = '1.50';
-                document.getElementById('pcfMinValue').textContent = '0.00';
-                document.getElementById('pcfMaxValue').textContent = '1.50';
+                pcfMinSlider.value = '0.00';
+                pcfMaxSlider.value = '1.50';
+                pcfMinValDisplay.textContent = '0.00';
+                pcfMaxValDisplay.textContent = '1.50+';
                 document.getElementById('searchInput').value = '';
 
-                // Reset Map Modes
                 isColorMode = false;
                 isBarMode = false;
                 isHeatMode = false;
@@ -456,9 +459,8 @@
                 document.getElementById('barChartBtn').classList.remove('active');
                 document.getElementById('heatMapBtn').classList.remove('active');
 
-                // Force map to re-center on reset
+                // 强制重置视角
                 isInitialLoad = true;
-                
                 renderApplication();
             });
 
@@ -475,7 +477,7 @@
                 isHeatMode = !isHeatMode; this.classList.toggle('active'); renderApplication();
             });
 
-            // View Switcher 
+            // View Switcher
             document.getElementById('tableViewBtn').addEventListener('click', function() {
                 isTableMode = !isTableMode;
                 let mapView = document.getElementById('mapView');
@@ -553,11 +555,14 @@
             let selectedSpecies = document.getElementById('speciesFilter').value;
             let minVal = parseFloat(document.getElementById('pcfMin').value) || 0;
             let maxVal = parseFloat(document.getElementById('pcfMax').value) || 1.5;
+            
+            // 安全机制：如果滑块在最右端1.5，则不再限制最大值，包含所有的异常超高点。
+            let isAtMax = (maxVal >= 1.5);
             let totalPcf = 0;
 
             allData.forEach(data => {
                 let matchSp = (selectedSpecies === "ALL" || data.species === selectedSpecies);
-                let matchPcf = (data.pcf >= minVal && data.pcf <= maxVal);
+                let matchPcf = (data.pcf >= minVal && (isAtMax ? true : data.pcf <= maxVal));
 
                 if (matchSp && matchPcf) {
                     filteredData.push(data);
