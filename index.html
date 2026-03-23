@@ -27,29 +27,29 @@
             display: flex; justify-content: center; align-items: center;
         }
         .login-box {
-            background: white; padding: 40px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
-            width: 300px; border: 1px solid var(--border-color);
+            background: white; padding: 40px; border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;
+            width: 320px; border: 1px solid var(--border-color);
         }
-        .login-box h3 { margin-top: 0; color: var(--text-color); margin-bottom: 20px; font-size: 22px; }
+        .login-box h3 { margin-top: 0; color: var(--text-color); margin-bottom: 25px; font-size: 20px; font-weight: 600;}
         .login-box input {
-            width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc;
-            border-radius: 6px; font-size: 16px; box-sizing: border-box; outline: none;
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc;
+            border-radius: 4px; font-size: 15px; box-sizing: border-box; outline: none; transition: border-color 0.2s;
         }
         .login-box input:focus { border-color: var(--primary); }
-        .error-msg { color: #e74c3c; font-size: 13px; margin-bottom: 15px; display: none; }
-        .login-box .btn { width: 100%; justify-content: center; padding: 10px; font-size: 16px; }
+        .error-msg { color: #e74c3c; font-size: 13px; margin-bottom: 15px; display: none; text-align: left;}
+        .login-box .btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; border-radius: 4px;}
 
         /* Main Dashboard */
         #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
 
         /* Header Styling */
-        #header { padding: 15px 25px; background-color: var(--bg-color); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow); z-index: 1000; gap: 15px;}
-        .header-title { margin: 0; font-size: 20px; font-weight: 600; color: var(--text-color); display: flex; align-items: center; gap: 10px; }
+        #header { padding: 15px 25px; background-color: var(--bg-color); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 10px var(--shadow); z-index: 1000; gap: 15px;}
+        .header-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-color); letter-spacing: 0.5px;}
         
         /* Control Panel Styling */
         .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; font-size: 13px; }
-        .control-group { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .control-group { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); }
         select { padding: 4px 8px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; background: white; }
         
         /* Range Sliders */
@@ -59,48 +59,48 @@
         .pcf-display { display: inline-block; width: 30px; font-weight: 600; color: var(--primary); text-align: right; }
         
         /* Buttons */
-        .btn { background-color: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3); }
-        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4); }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 5px; }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3); }
         .btn:active { transform: translateY(0); }
-        .btn-toggle { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); box-shadow: none; }
+        .btn-toggle { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); }
         .btn-toggle:hover { background-color: #f1f2f6; }
-        .btn-toggle.active { background-color: #fff3e0; border-color: #ff9800; color: #e65100; box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2); }
-        .btn-toggle-bar { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); box-shadow: none; }
-        .btn-toggle-bar.active { background-color: #e8f4fd; border-color: #3498db; color: #1565c0; box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2); }
+        .btn-toggle.active { background-color: #fff3e0; border-color: #ff9800; color: #e65100; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-toggle-bar { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); }
+        .btn-toggle-bar.active { background-color: #e8f4fd; border-color: #3498db; color: #1565c0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
         
         /* Map Container */
         #map { flex: 1; width: 100%; }
         
         /* Popup Styling */
-        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.05); }
-        .popup-content { font-size: 13px; line-height: 1.6; color: #444; min-width: 170px; }
+        .leaflet-popup-content-wrapper { border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); }
+        .popup-content { font-size: 13px; line-height: 1.6; color: #333; min-width: 180px; }
         .popup-header { border-bottom: 1px solid #eee; padding-bottom: 6px; margin-bottom: 6px; font-weight: 600; color: var(--text-color); font-size: 14px; }
         .highlight { color: #e74c3c; font-weight: bold; font-size: 14px;}
 
         /* Tooltip fix for bars */
-        .leaflet-tooltip { border-radius: 4px; border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.2); font-weight: bold;}
+        .leaflet-tooltip { border-radius: 2px; border: 1px solid #ccc; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-weight: 600; font-size: 12px;}
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h3>🔒 Access Required</h3>
-            <input type="password" id="passwordInput" placeholder="Enter Password">
-            <div id="errorMsg" class="error-msg">Incorrect password. Please try again.</div>
-            <button class="btn" id="loginBtn">Enter Dashboard</button>
+            <h3>System Access Required</h3>
+            <input type="password" id="passwordInput" placeholder="Enter Authorization Code">
+            <div id="errorMsg" class="error-msg">Authentication failed. Please verify your code.</div>
+            <button class="btn" id="loginBtn">Authenticate</button>
         </div>
     </div>
 
     <div id="mainDashboard">
         <div id="header">
-            <h2 class="header-title">🌲 Line 7003 Inspection</h2>
+            <h2 class="header-title">Line 7003 Inspection Data</h2>
             
             <div class="controls">
                 <div class="control-group">
                     <label for="speciesFilter"><strong>Species:</strong></label>
                     <select id="speciesFilter">
-                        <option value="ALL">All</option>
+                        <option value="ALL">All Species</option>
                         <option value="Red Pine">Red Pine</option>
                         <option value="West Red Cedar">West Red Cedar</option>
                         <option value="South Yellow Pine">South Yellow Pine</option>
@@ -111,20 +111,21 @@
                 
                 <div class="control-group slider-container">
                     <div class="slider-row">
-                        <label><strong>Min:</strong></label>
+                        <label><strong>Min PCF:</strong></label>
                         <input type="range" id="pcfMin" min="0" max="1.0" step="0.01" value="0">
                         <span class="pcf-display" id="pcfMinValue">0.00</span>
                     </div>
                     <div class="slider-row">
-                        <label><strong>Max:</strong></label>
+                        <label><strong>Max PCF:</strong></label>
                         <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
                         <span class="pcf-display" id="pcfMaxValue">1.50</span>
                     </div>
                 </div>
 
-                <button class="btn btn-toggle" id="colorToggleBtn">🎨 Color by PCF</button>
-                <button class="btn btn-toggle-bar" id="barChartBtn">📊 3D Bars</button> <button class="btn" id="locationBtn">📍 My Location</button>
-                <button class="btn" id="exportBtn">📥 Export</button>
+                <button class="btn btn-toggle" id="colorToggleBtn">Color Gradient</button>
+                <button class="btn btn-toggle-bar" id="barChartBtn">3D Bar View</button>
+                <button class="btn" id="locationBtn">Get Location</button>
+                <button class="btn" id="exportBtn">Export Data</button>
             </div>
         </div>
 
@@ -133,7 +134,7 @@
 
     <script>
         // ==========================================
-        // 🔒 Password setup
+        // Password setup
         const CORRECT_PASSWORD = "7003"; 
         // ==========================================
 
@@ -165,7 +166,7 @@
         let allData = [];
         let filteredDataForExport = [];
         let isColorGradientMode = false;
-        let isBarChartMode = false; // 新增：是否处于柱状图模式
+        let isBarChartMode = false;
 
         function initializeDashboard() {
             map = L.map('map').setView([45.5, -62.0], 9);
@@ -202,14 +203,11 @@
             return 'Other';
         }
 
-        // Color mapping logic
         function getMarkerColor(pcf) {
-            if (!isColorGradientMode && !isBarChartMode) return "#3498db"; // 默认基础蓝
-            
-            // 如果开启了渐变色 或者 开启了3D柱状图（柱状图默认带渐变色才好看）
+            if (!isColorGradientMode && !isBarChartMode) return "#3498db"; 
             if (pcf <= 0) return "#bdc3c7"; 
             let ratio = Math.min(pcf, 0.5) / 0.5;
-            let hue = 60 - (ratio * 60); // 60(黄) 到 0(红)
+            let hue = 60 - (ratio * 60); 
             return `hsl(${hue}, 100%, 50%)`;
         }
 
@@ -250,7 +248,7 @@
                             let coordKey = `${lat.toFixed(5)},${lon.toFixed(5)}`;
                             if (coordOccurrences[coordKey] !== undefined) {
                                 coordOccurrences[coordKey]++;
-                                lat += 0.00006 * coordOccurrences[coordKey]; // 放大一点偏移量防止柱状图遮挡
+                                lat += 0.00006 * coordOccurrences[coordKey]; 
                                 lon += 0.00006 * coordOccurrences[coordKey];
                             } else {
                                 coordOccurrences[coordKey] = 0;
@@ -301,7 +299,6 @@
                 renderMap();
             });
 
-            // --- 新增 3D Bar 模式切换事件 ---
             barChartBtn.addEventListener('click', function() {
                 isBarChartMode = !isBarChartMode;
                 this.classList.toggle('active');
@@ -311,15 +308,15 @@
             exportBtn.addEventListener('click', exportToCSV);
 
             locationBtn.addEventListener('click', function() {
-                if (!navigator.geolocation) { alert("Your browser doesn't support geolocation."); return; }
-                let originalText = this.innerHTML; this.innerHTML = "⏳ Locating...";
+                if (!navigator.geolocation) { alert("Geolocation is not supported by your browser."); return; }
+                let originalText = this.innerHTML; this.innerHTML = "Locating...";
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
                         locationBtn.innerHTML = originalText;
                         let lat = position.coords.latitude; let lon = position.coords.longitude;
                         if (userLocationMarker) map.removeLayer(userLocationMarker);
                         userLocationMarker = L.circleMarker([lat, lon], { radius: 5, fillColor: "#007bff", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 }).addTo(map);
-                        userLocationMarker.bindTooltip("You are here").openTooltip();
+                        userLocationMarker.bindTooltip("Current Location").openTooltip();
                         map.flyTo([lat, lon], 14, { duration: 1.5 });
                     }, 
                     function(error) { locationBtn.innerHTML = originalText; alert("Unable to retrieve location."); }, 
@@ -356,34 +353,28 @@
                         </div>
                     `;
 
-                    // ==========================================
-                    // 渲染逻辑分支：是画圆点，还是画 3D 柱状图
-                    // ==========================================
                     if (isBarChartMode) {
-                        // 动态计算柱子的高度：根据浓度等比例缩放，最高 80px，浓度为 0 时最低 6px
                         let barHeight = Math.max((row.pcfValue / 1.0) * 80, 6); 
                         
-                        // 使用 HTML 和 CSS 生成带有 3D 光影效果的圆柱体
                         let barHtml = `
                             <div style="
                                 width: 12px;
                                 height: ${barHeight}px;
                                 background-color: ${markerColor};
-                                background-image: linear-gradient(to right, rgba(255,255,255,0.5) 0%, rgba(0,0,0,0.3) 100%);
-                                box-shadow: 3px 3px 6px rgba(0,0,0,0.4);
-                                border: 1px solid rgba(255,255,255,0.7);
+                                background-image: linear-gradient(to right, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0.2) 100%);
+                                box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+                                border: 1px solid rgba(255,255,255,0.6);
                                 border-bottom: 1px solid #333;
-                                border-radius: 3px 3px 1px 1px;
+                                border-radius: 2px 2px 1px 1px;
                             "></div>
                         `;
 
-                        // 使用 L.divIcon 把自定义 HTML 作为图标注入地图
                         let barIcon = L.divIcon({
                             html: barHtml,
-                            className: '', // 去除 Leaflet 默认的白色方块底色
+                            className: '',
                             iconSize: [12, barHeight],
-                            iconAnchor: [6, barHeight], // 把图标的锚点对准柱子的正底部
-                            popupAnchor: [0, -barHeight] // 弹窗从柱子的最顶部弹出
+                            iconAnchor: [6, barHeight],
+                            popupAnchor: [0, -barHeight]
                         });
 
                         let marker = L.marker([row.cleanLat, row.cleanLon], { icon: barIcon });
@@ -394,7 +385,6 @@
                         bounds.push([row.cleanLat, row.cleanLon]);
 
                     } else {
-                        // 原来的 2D 圆点模式
                         let marker = L.circleMarker([row.cleanLat, row.cleanLon], {
                             radius: 6, fillColor: markerColor, color: "#ffffff", weight: 1.5, opacity: 1, fillOpacity: 0.85
                         });
@@ -423,7 +413,7 @@
         }
 
         function exportToCSV() {
-            if (filteredDataForExport.length === 0) { alert("No data available to export."); return; }
+            if (filteredDataForExport.length === 0) { alert("No data available to export based on current filters."); return; }
             const cleanData = filteredDataForExport.map(row => {
                 const newRow = Object.assign({}, row);
                 delete newRow.cleanLat; delete newRow.cleanLon; delete newRow.stdSpecies; delete newRow.pcfValue;
@@ -433,7 +423,7 @@
             const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Filtered_Line_7003_Export.csv";
+            link.download = "Line_7003_Export.csv";
             document.body.appendChild(link);
             link.click(); document.body.removeChild(link);
         }
