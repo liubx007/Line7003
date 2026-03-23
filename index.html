@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Line 7003 Inspection Dashboard</title>
+    <title>Line 7003 Analytical Dashboard</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,92 +12,124 @@
 
     <style>
         :root {
-            --bg-color: #ffffff;
-            --text-color: #2c3e50;
-            --primary: #2980b9;
-            --primary-hover: #21618c;
-            --secondary: #ecf0f1;
-            --border-color: #bdc3c7;
-            --danger: #c0392b;
-            --shadow: rgba(0, 0, 0, 0.1);
+            /* Enterprise Color Palette */
+            --bg-main: #f4f6f8;
+            --bg-panel: #ffffff;
+            --text-main: #202b36;
+            --text-muted: #637381;
+            --border-color: #dfe3e8;
+            --primary: #0052cc;
+            --primary-hover: #0043a6;
+            --danger: #de3618;
+            --danger-bg: #ffe9e5;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
+            --radius: 6px;
         }
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--secondary); color: var(--text-color); overflow: hidden; }
+
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; }
         
         /* --- Login Overlay --- */
-        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #f8f9fa; z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: white; padding: 40px; border-radius: 4px; box-shadow: 0 4px 15px var(--shadow); text-align: center; width: 320px; border: 1px solid var(--border-color); }
-        .login-box h3 { margin-top: 0; margin-bottom: 25px; font-size: 20px; font-weight: 600; color: #333;}
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
-        .login-box input:focus { border-color: var(--primary); }
-        .error-msg { color: var(--danger); font-size: 13px; margin-bottom: 15px; display: none; text-align: left;}
-        .login-box .btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; }
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-main); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: var(--bg-panel); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow-md); text-align: center; width: 340px; border: 1px solid var(--border-color); }
+        .login-box h3 { margin-top: 0; margin-bottom: 24px; font-size: 20px; font-weight: 600; color: var(--text-main); }
+        .login-box input { width: 100%; padding: 10px 12px; margin-bottom: 16px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 14px; box-sizing: border-box; outline: none; transition: all 0.2s; }
+        .login-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1); }
+        .error-msg { color: var(--danger); font-size: 13px; margin-bottom: 16px; display: none; text-align: left; background: var(--danger-bg); padding: 8px; border-radius: 4px; border: 1px solid #f9c2b7;}
+        .login-box .btn-primary { width: 100%; justify-content: center; padding: 10px; font-size: 15px; }
 
-        /* --- Main Dashboard Layout --- */
+        /* --- Main Layout --- */
         #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
-        #workspace { display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; }
-        #map { width: 100%; height: 100%; }
+        
+        /* --- Two-Row Header --- */
+        #header { background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-sm); z-index: 1000; display: flex; flex-direction: column; }
+        .header-top { padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
+        .header-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-main); letter-spacing: 0.3px; }
+        
+        .header-bottom { padding: 12px 24px; display: flex; flex-wrap: nowrap; align-items: center; gap: 16px; overflow-x: auto; white-space: nowrap; }
+        
+        /* --- Controls & Inputs --- */
+        .control-group { display: flex; align-items: center; gap: 8px; }
+        .control-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+        .form-control { padding: 6px 10px; font-size: 13px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-main); outline: none; transition: all 0.2s; }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1); }
+        input[type="number"].form-control { width: 70px; }
+        input[type="text"].form-control { width: 140px; }
+        
+        .divider { width: 1px; height: 24px; background-color: var(--border-color); margin: 0 4px; }
 
-        /* --- Header & Controls --- */
-        /* 强制单行，超出部分允许滚动 */
-        #header { padding: 10px 15px; background-color: var(--bg-color); display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 5px var(--shadow); z-index: 1000; overflow-x: auto; white-space: nowrap; gap: 15px;}
-        .header-title { margin: 0; font-size: 16px; font-weight: 600; color: var(--primary); letter-spacing: 0.5px;}
-        
-        .controls { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; font-size: 12px; }
-        .control-group { display: flex; align-items: center; gap: 6px; background: #f8f9fa; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); }
-        select { padding: 4px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; background: white; }
-        input[type="text"] { padding: 4px 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; width: 100px;}
-        
-        .slider-row { display: flex; align-items: center; gap: 4px; }
-        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 60px; }
-        .pcf-display { display: inline-block; width: 28px; font-weight: 600; color: var(--primary); text-align: right; }
-        
         /* --- Buttons --- */
-        .btn { background-color: var(--primary); color: white; border: none; padding: 5px 12px; border-radius: 4px; font-weight: 500; font-size: 12px; cursor: pointer; transition: background-color 0.2s; white-space: nowrap;}
-        .btn:hover { background-color: var(--primary-hover); }
-        .btn-toggle { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); }
-        .btn-toggle:hover { background-color: #f1f2f6; }
-        .btn-toggle.active { background-color: #e8f4fd; border-color: var(--primary); color: var(--primary); font-weight: 600; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: var(--radius); font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; }
+        .btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .btn-primary:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); box-shadow: var(--shadow-sm); }
         
-        /* --- Summary Panel --- */
-        #summaryPanel {
-            position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95);
-            padding: 12px 15px; border-radius: 4px; border: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 999; min-width: 140px; pointer-events: none;
-        }
-        .summary-item { margin-bottom: 8px; font-size: 13px; color: #555; display: flex; justify-content: space-between; align-items: center;}
-        .summary-item:last-child { margin-bottom: 0; }
-        .summary-val { font-weight: bold; font-size: 14px; color: var(--primary); margin-left: 15px;}
+        .btn-outline { background-color: var(--bg-panel); color: var(--text-main); border-color: var(--border-color); }
+        .btn-outline:hover { background-color: var(--bg-main); border-color: #c4cdd5; }
+        .btn-outline.active { background-color: #ebf5ff; border-color: var(--primary); color: var(--primary); font-weight: 600; }
+        
+        /* --- Workspace & Views --- */
+        #workspace { flex: 1; position: relative; overflow: hidden; display: flex; }
+        .view-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; display: flex; flex-direction: column; }
+        .view-panel.active { opacity: 1; pointer-events: auto; position: relative; }
+        
+        #map { width: 100%; height: 100%; background-color: #e3e9f0; }
 
-        /* --- Popups & Tooltips --- */
-        .leaflet-popup-content-wrapper { border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; }
-        .popup-header { border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
-        .leaflet-tooltip { border-radius: 2px; border: 1px solid #ccc; font-weight: 600; font-size: 12px;}
+        /* --- Summary Overlay on Map --- */
+        #summaryPanel {
+            position: absolute; bottom: 24px; left: 24px; background: rgba(255, 255, 255, 0.95);
+            padding: 16px; border-radius: var(--radius); border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md); z-index: 999; min-width: 180px; pointer-events: none;
+            backdrop-filter: blur(4px);
+        }
+        .summary-title { font-weight: 600; font-size: 14px; margin-bottom: 12px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; }
+        .summary-item { margin-bottom: 8px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        .summary-item:last-child { margin-bottom: 0; }
+        .summary-val { font-weight: 600; font-size: 15px; color: var(--text-main); }
+
+        /* --- Table View --- */
+        #tableContainer { width: 100%; height: 100%; overflow: auto; background: var(--bg-panel); padding: 0; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 13px; }
+        th { background-color: #f9fafb; padding: 12px 24px; font-weight: 600; color: var(--text-muted); position: sticky; top: 0; border-bottom: 1px solid var(--border-color); z-index: 10; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        td { padding: 12px 24px; border-bottom: 1px solid var(--bg-main); color: var(--text-main); transition: background-color 0.1s; }
+        tbody tr:hover td { background-color: #f4f6f8; }
+        .val-danger { color: var(--danger); font-weight: 600; }
+
+        /* --- Map Popups --- */
+        .leaflet-popup-content-wrapper { border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); padding: 4px; }
+        .popup-content { font-size: 13px; line-height: 1.6; color: var(--text-main); min-width: 200px; }
+        .popup-header { border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: var(--primary); }
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h3>System Access</h3>
-            <input type="password" id="passwordInput" placeholder="Enter Authorization Code">
-            <div id="errorMsg" class="error-msg">Authentication failed.</div>
-            <button class="btn" id="loginBtn">Authenticate</button>
+            <h3>System Authorization</h3>
+            <input type="password" id="passwordInput" placeholder="Enter Access Code">
+            <div id="errorMsg" class="error-msg">Invalid access code. Please verify.</div>
+            <button class="btn btn-primary" id="loginBtn">Authenticate</button>
         </div>
     </div>
 
     <div id="mainDashboard">
+        
         <div id="header">
-            <h2 class="header-title">Line 7003 Analytical Dashboard</h2>
+            <div class="header-top">
+                <h2 class="header-title">Line 7003 Analytical Dashboard</h2>
+            </div>
             
-            <div class="controls">
+            <div class="header-bottom">
+                
                 <div class="control-group">
-                    <input type="text" id="searchInput" placeholder="Search Pole ID...">
-                    <button class="btn" id="searchBtn">Find</button>
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search Pole ID">
+                    <button class="btn btn-outline" id="searchBtn">Find</button>
                 </div>
 
+                <div class="divider"></div>
+
                 <div class="control-group">
-                    <label>Species:</label>
-                    <select id="speciesFilter">
+                    <span class="control-label">Species</span>
+                    <select id="speciesFilter" class="form-control">
                         <option value="ALL">All Species</option>
                         <option value="Red Pine">Red Pine</option>
                         <option value="West Red Cedar">West Red Cedar</option>
@@ -107,33 +139,62 @@
                     </select>
                 </div>
                 
+                <div class="divider"></div>
+                
                 <div class="control-group">
-                    <div class="slider-row">
-                        <label>Min:</label>
-                        <input type="range" id="pcfMin" min="0" max="1.0" step="0.01" value="0">
-                        <span class="pcf-display" id="pcfMinValue">0.00</span>
-                    </div>
-                    <div class="slider-row" style="margin-left: 8px;">
-                        <label>Max:</label>
-                        <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
-                        <span class="pcf-display" id="pcfMaxValue">1.50</span>
-                    </div>
+                    <span class="control-label">Min PCF</span>
+                    <input type="number" id="pcfMin" class="form-control" min="0" max="1.5" step="0.01" value="0.00">
+                </div>
+                <div class="control-group">
+                    <span class="control-label">Max PCF</span>
+                    <input type="number" id="pcfMax" class="form-control" min="0" max="1.5" step="0.01" value="1.50">
                 </div>
 
-                <button class="btn btn-toggle" id="colorToggleBtn">Gradient Map</button>
-                <button class="btn btn-toggle" id="barChartBtn">3D Bar Chart</button>
-                <button class="btn btn-toggle" id="heatMapBtn">Heatmap</button>
-                <button class="btn" id="exportBtn">Export Data</button>
+                <div class="divider"></div>
+
+                <button class="btn btn-outline" id="colorToggleBtn">Gradient Map</button>
+                <button class="btn btn-outline" id="barChartBtn">3D Bar Chart</button>
+                <button class="btn btn-outline" id="heatMapBtn">Heatmap</button>
+                
+                <div class="divider"></div>
+
+                <button class="btn btn-outline" id="tableViewBtn">Table View</button>
+                <button class="btn btn-outline" id="locationBtn">Get Location</button>
+                <button class="btn btn-primary" id="exportBtn">Export Data</button>
+
             </div>
         </div>
 
         <div id="workspace">
-            <div id="map"></div>
-            <div id="summaryPanel">
-                <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Data Summary</div>
-                <div class="summary-item">Total Poles: <span class="summary-val" id="sumTotal">0</span></div>
-                <div class="summary-item">Avg PCF: <span class="summary-val" id="sumAvg">0.00</span></div>
+            
+            <div id="mapView" class="view-panel active">
+                <div id="map"></div>
+                <div id="summaryPanel">
+                    <div class="summary-title">Data Summary</div>
+                    <div class="summary-item">Total Poles Filtered <span class="summary-val" id="sumTotal">0</span></div>
+                    <div class="summary-item">Average PCF <span class="summary-val" id="sumAvg">0.00</span></div>
+                </div>
             </div>
+
+            <div id="tableView" class="view-panel">
+                <div id="tableContainer">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Pole ID</th>
+                                <th>Wood Species</th>
+                                <th>Moisture (%)</th>
+                                <th>Preservative</th>
+                                <th>PCF Concentration</th>
+                                <th>GPS Coordinates</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -164,10 +225,8 @@
         loginBtn.addEventListener('click', attemptLogin);
         passwordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') attemptLogin(); });
 
-        // Core Application State
-        let map;
-        let markersLayer;
-        let heatLayer = null;
+        // Core State
+        let map, markersLayer, heatLayer = null, userLocationMarker = null;
         let allData = [];
         let filteredData = [];
         let markerRegistry = {}; 
@@ -175,11 +234,12 @@
         let isColorMode = false;
         let isBarMode = false;
         let isHeatMode = false;
+        let isTableMode = false;
 
         function initializeDashboard() {
             map = L.map('map').setView([45.5, -62.0], 9);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO', maxZoom: 19
             }).addTo(map);
 
             markersLayer = L.layerGroup().addTo(map);
@@ -211,8 +271,8 @@
         }
 
         function getMarkerColor(pcf) {
-            if (!isColorMode && !isBarMode) return "#2980b9"; 
-            if (pcf <= 0) return "#95a5a6"; 
+            if (!isColorMode && !isBarMode) return "#0052cc"; // Default Enterprise Blue
+            if (pcf <= 0) return "#919eab"; 
             let ratio = Math.min(pcf, 0.5) / 0.5;
             let hue = 60 - (ratio * 60); 
             return `hsl(${hue}, 100%, 45%)`;
@@ -225,7 +285,7 @@
                     let rawData = results.data;
                     let refLat = null, refLon = null;
 
-                    // Pass 1: Handle 324 coordinate fix
+                    // Fix for 324 (3)
                     rawData.forEach(row => {
                         if (String(row['Structure Number1']).trim() === '324 (2)') {
                             refLat = row['GPS Lat']; refLon = row['GPS Long'];
@@ -234,7 +294,6 @@
 
                     let coordOccurrences = {}; 
 
-                    // Pass 2: Clean and structure
                     rawData.forEach(row => {
                         let structNum = String(row['Structure Number1']).trim();
                         if (structNum === '324 (3)' && refLat) {
@@ -279,22 +338,25 @@
         }
 
         function setupEventListeners() {
+            // Filters
             document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            document.getElementById('pcfMin').addEventListener('input', function() {
-                if (parseFloat(this.value) > parseFloat(document.getElementById('pcfMax').value)) document.getElementById('pcfMax').value = this.value;
-                document.getElementById('pcfMinValue').textContent = parseFloat(this.value).toFixed(2);
-                document.getElementById('pcfMaxValue').textContent = parseFloat(document.getElementById('pcfMax').value).toFixed(2);
+            // Number Inputs replacing Sliders
+            document.getElementById('pcfMin').addEventListener('change', function() {
+                let minVal = parseFloat(this.value) || 0;
+                let maxVal = parseFloat(document.getElementById('pcfMax').value) || 1.5;
+                if (minVal > maxVal) this.value = maxVal;
                 renderApplication();
             });
             
-            document.getElementById('pcfMax').addEventListener('input', function() {
-                if (parseFloat(this.value) < parseFloat(document.getElementById('pcfMin').value)) document.getElementById('pcfMin').value = this.value;
-                document.getElementById('pcfMinValue').textContent = parseFloat(document.getElementById('pcfMin').value).toFixed(2);
-                document.getElementById('pcfMaxValue').textContent = parseFloat(this.value).toFixed(2);
+            document.getElementById('pcfMax').addEventListener('change', function() {
+                let maxVal = parseFloat(this.value) || 1.5;
+                let minVal = parseFloat(document.getElementById('pcfMin').value) || 0;
+                if (maxVal < minVal) this.value = minVal;
                 renderApplication();
             });
 
+            // Map Mode Toggles
             document.getElementById('colorToggleBtn').addEventListener('click', function() {
                 isColorMode = !isColorMode; this.classList.toggle('active'); renderApplication();
             });
@@ -307,11 +369,59 @@
                 isHeatMode = !isHeatMode; this.classList.toggle('active'); renderApplication();
             });
 
+            // View Switcher (Map vs Table)
+            document.getElementById('tableViewBtn').addEventListener('click', function() {
+                isTableMode = !isTableMode;
+                let mapView = document.getElementById('mapView');
+                let tableView = document.getElementById('tableView');
+                
+                if (isTableMode) {
+                    this.classList.add('active');
+                    this.textContent = 'Map View';
+                    mapView.classList.remove('active');
+                    tableView.classList.add('active');
+                } else {
+                    this.classList.remove('active');
+                    this.textContent = 'Table View';
+                    tableView.classList.remove('active');
+                    mapView.classList.add('active');
+                    map.invalidateSize(); // Fix leaflet rendering issue when unhidden
+                }
+            });
+
+            // Actions
             document.getElementById('exportBtn').addEventListener('click', exportData);
 
             document.getElementById('searchBtn').addEventListener('click', searchPole);
             document.getElementById('searchInput').addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') searchPole();
+            });
+
+            document.getElementById('locationBtn').addEventListener('click', function() {
+                if (!navigator.geolocation) { alert("Geolocation is not supported by your browser."); return; }
+                
+                if(isTableMode) {
+                    // Switch to map view to show location
+                    document.getElementById('tableViewBtn').click();
+                }
+
+                let originalText = this.innerHTML; this.innerHTML = "Locating...";
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('locationBtn').innerHTML = originalText;
+                        let lat = position.coords.latitude; let lon = position.coords.longitude;
+                        if (userLocationMarker) map.removeLayer(userLocationMarker);
+                        
+                        userLocationMarker = L.circleMarker([lat, lon], { 
+                            radius: 6, fillColor: "#0052cc", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 
+                        }).addTo(map);
+                        
+                        userLocationMarker.bindTooltip("Current Location").openTooltip();
+                        map.flyTo([lat, lon], 14, { duration: 1.5 });
+                    }, 
+                    function(error) { document.getElementById('locationBtn').innerHTML = originalText; alert("Unable to retrieve location. Please check browser permissions."); }, 
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
             });
         }
 
@@ -320,28 +430,28 @@
             if (!query) return;
 
             let target = filteredData.find(d => d.id.toUpperCase().includes(query));
-            if (target && markerRegistry[target.id]) {
-                let m = markerRegistry[target.id];
-                map.flyTo(m.getLatLng(), 18, {duration: 1.5});
-                setTimeout(() => m.openPopup(), 1500);
+            if (target) {
+                if (isTableMode) {
+                    // If in table mode, switch to map mode first
+                    document.getElementById('tableViewBtn').click();
+                }
+                
+                if(markerRegistry[target.id]) {
+                    let m = markerRegistry[target.id];
+                    map.flyTo(m.getLatLng(), 18, {duration: 1.0});
+                    setTimeout(() => m.openPopup(), 1000);
+                }
             } else {
                 alert("Pole ID not found in current filtered dataset.");
             }
         }
 
         function renderApplication() {
-            markersLayer.clearLayers();
-            if (heatLayer) map.removeLayer(heatLayer);
-            markerRegistry = {};
+            // Process Filters
             filteredData = [];
-            
             let selectedSpecies = document.getElementById('speciesFilter').value;
-            let minVal = parseFloat(document.getElementById('pcfMin').value);
-            let maxVal = parseFloat(document.getElementById('pcfMax').value);
-            
-            let bounds = [];
-            let heatData = [];
-            
+            let minVal = parseFloat(document.getElementById('pcfMin').value) || 0;
+            let maxVal = parseFloat(document.getElementById('pcfMax').value) || 1.5;
             let totalPcf = 0;
 
             allData.forEach(data => {
@@ -351,63 +461,114 @@
                 if (matchSp && matchPcf) {
                     filteredData.push(data);
                     totalPcf += data.pcf;
+                }
+            });
 
-                    let markerColor = getMarkerColor(data.pcf);
-                    
-                    let popupHTML = `
-                        <div class="popup-content">
-                            <div class="popup-header">Pole ID: ${data.id}</div>
-                            Species: ${data.species}<br>
-                            Preservative: ${data.preservative}<br>
-                            Moisture: ${data.moisture}%<br>
-                            PCF Concentration: <span style="font-weight:bold; color:${data.pcf > 0.5 ? '#c0392b' : '#333'}">${data.pcf}</span>
-                        </div>
+            // Render Map Data
+            renderMap();
+            
+            // Render Table Data
+            renderTable();
+
+            // Update Summary
+            let count = filteredData.length;
+            document.getElementById('sumTotal').textContent = count;
+            document.getElementById('sumAvg').textContent = count > 0 ? (totalPcf / count).toFixed(3) : "0.00";
+        }
+
+        function renderMap() {
+            markersLayer.clearLayers();
+            if (heatLayer) map.removeLayer(heatLayer);
+            markerRegistry = {};
+            
+            let bounds = [];
+            let heatData = [];
+
+            filteredData.forEach(data => {
+                let markerColor = getMarkerColor(data.pcf);
+                
+                let popupHTML = `
+                    <div class="popup-content">
+                        <div class="popup-header">Pole ID: ${data.id}</div>
+                        <div style="margin-bottom: 4px;"><b>Species:</b> ${data.species}</div>
+                        <div style="margin-bottom: 4px;"><b>Preservative:</b> ${data.preservative}</div>
+                        <div style="margin-bottom: 4px;"><b>Moisture:</b> ${data.moisture}%</div>
+                        <div><b>PCF Concentration:</b> <span style="font-weight:600; color:${data.pcf > 0.5 ? '#de3618' : '#202b36'}">${data.pcf}</span></div>
+                    </div>
+                `;
+
+                let marker;
+                if (isBarMode && !isHeatMode) {
+                    let h = Math.max((data.pcf / 1.0) * 80, 6); 
+                    let barHtml = `
+                        <div style="width:12px; height:${h}px; background-color:${markerColor}; 
+                        box-shadow: 2px 2px 5px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.6); border-bottom: 1px solid #333;"></div>
                     `;
+                    let barIcon = L.divIcon({ html: barHtml, className: '', iconSize: [12, h], iconAnchor: [6, h], popupAnchor: [0, -h] });
+                    marker = L.marker([data.lat, data.lon], { icon: barIcon });
+                } else if (!isHeatMode) {
+                    marker = L.circleMarker([data.lat, data.lon], { radius: 6, fillColor: markerColor, color: "#fff", weight: 1.5, opacity: 1, fillOpacity: 0.85 });
+                    marker.on('mouseover', function () { this.setStyle({ radius: 8, weight: 2 }); });
+                    marker.on('mouseout', function () { this.setStyle({ radius: 6, weight: 1.5 }); });
+                }
 
-                    let marker;
-                    if (isBarMode && !isHeatMode) {
-                        let h = Math.max((data.pcf / 1.0) * 80, 6); 
-                        let barHtml = `
-                            <div style="width:12px; height:${h}px; background-color:${markerColor}; 
-                            box-shadow: 2px 2px 5px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.4); border-bottom: 1px solid #333;"></div>
-                        `;
-                        let barIcon = L.divIcon({ html: barHtml, className: '', iconSize: [12, h], iconAnchor: [6, h], popupAnchor: [0, -h] });
-                        marker = L.marker([data.lat, data.lon], { icon: barIcon });
-                    } else if (!isHeatMode) {
-                        marker = L.circleMarker([data.lat, data.lon], { radius: 6, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.9 });
-                        marker.on('mouseover', function () { this.setStyle({ radius: 9, weight: 2 }); });
-                        marker.on('mouseout', function () { this.setStyle({ radius: 6, weight: 1 }); });
-                    }
+                if (!isHeatMode) {
+                    marker.bindPopup(popupHTML);
+                    marker.bindTooltip(data.id, { direction: 'top', offset: [0, isBarMode ? -10 : -5] });
+                    markersLayer.addLayer(marker);
+                    markerRegistry[data.id] = marker;
+                }
 
-                    if (!isHeatMode) {
-                        marker.bindPopup(popupHTML);
-                        marker.bindTooltip(data.id, { direction: 'top', offset: [0, isBarMode ? -10 : -5] });
-                        markersLayer.addLayer(marker);
-                        markerRegistry[data.id] = marker;
-                    }
-
-                    bounds.push([data.lat, data.lon]);
-                    
-                    if (isHeatMode) {
-                        let intensity = Math.min(data.pcf / 1.0, 1.0);
-                        heatData.push([data.lat, data.lon, intensity]);
-                    }
+                bounds.push([data.lat, data.lon]);
+                
+                if (isHeatMode) {
+                    let intensity = Math.min(data.pcf / 1.0, 1.0);
+                    heatData.push([data.lat, data.lon, intensity]);
                 }
             });
 
             if (isHeatMode && heatData.length > 0) {
                 heatLayer = L.heatLayer(heatData, {
                     radius: 20, blur: 15, maxZoom: 14, 
-                    gradient: {0.2: 'blue', 0.4: 'cyan', 0.6: 'lime', 0.8: 'yellow', 1.0: 'red'}
+                    gradient: {0.2: '#0052cc', 0.4: '#00a3bf', 0.6: '#57d9a3', 0.8: '#ffc400', 1.0: '#de3618'}
                 }).addTo(map);
             }
 
-            if (bounds.length > 0) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+            if (bounds.length > 0 && !userLocationMarker) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+        }
 
-            // Update Simplified Summary Panel
-            let count = filteredData.length;
-            document.getElementById('sumTotal').textContent = count;
-            document.getElementById('sumAvg').textContent = count > 0 ? (totalPcf / count).toFixed(3) : "0.00";
+        function renderTable() {
+            let tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            // Sort by Structure ID by default, or could be PCF
+            let sortedData = [...filteredData].sort((a, b) => b.pcf - a.pcf);
+
+            sortedData.forEach(data => {
+                let tr = document.createElement('tr');
+                
+                // Allow clicking row to view on map
+                tr.style.cursor = 'pointer';
+                tr.onclick = function() {
+                    document.getElementById('tableViewBtn').click(); // Switch to map
+                    if(markerRegistry[data.id]) {
+                        map.flyTo([data.lat, data.lon], 17, {duration: 0.8});
+                        setTimeout(() => markerRegistry[data.id].openPopup(), 800);
+                    }
+                };
+                
+                let pcfStyle = data.pcf > 0.5 ? 'class="val-danger"' : '';
+                
+                tr.innerHTML = `
+                    <td style="font-weight:600; color:var(--primary);">${data.id}</td>
+                    <td>${data.species}</td>
+                    <td>${data.moisture}</td>
+                    <td>${data.preservative}</td>
+                    <td ${pcfStyle}>${data.pcf.toFixed(3)}</td>
+                    <td style="color:var(--text-muted); font-size: 12px;">${data.lat.toFixed(5)}, ${data.lon.toFixed(5)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         function exportData() {
@@ -417,7 +578,7 @@
             let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             let link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Line_7003_Analytical_Export.csv";
+            link.download = "Line_7003_Export.csv";
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
     </script>
