@@ -27,7 +27,7 @@
             --radius: 4px;
         }
 
-        /* Scaled down ~10% (Base font 13px instead of 14px/11px) */
+        /* Scaled down ~10% (Base font 13px) */
         body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; font-size: 13px; }
         
         /* --- Login Overlay --- */
@@ -63,8 +63,8 @@
         .slider-row { display: flex; align-items: center; gap: 6px; }
         input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 80px; }
         
-        /* New Direct Number Input Styling */
-        .pcf-input { width: 44px; padding: 2px 4px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-weight: 600; color: var(--primary); text-align: center; outline: none; transition: border-color 0.2s; background: var(--bg-main); }
+        /* Direct Number Input Styling */
+        .pcf-input { width: 46px; padding: 3px 4px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-weight: 600; color: var(--primary); text-align: center; outline: none; transition: border-color 0.2s; background: var(--bg-main); }
         .pcf-input:focus { border-color: var(--primary); background: #fff; }
         .pcf-input::-webkit-inner-spin-button, .pcf-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         
@@ -404,7 +404,7 @@
 
             document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            // Sync Engine between Sliders and Number Inputs
+            // ========== 安全的双向同步引擎 ==========
             function syncValues(source) {
                 let minVal, maxVal;
                 
@@ -415,11 +415,17 @@
                     pcfMinInput.value = minVal.toFixed(2);
                     pcfMaxInput.value = maxVal.toFixed(2);
                 } else if (source === 'input') {
-                    minVal = parseFloat(pcfMinInput.value) || 0;
-                    maxVal = parseFloat(pcfMaxInput.value) || 0;
+                    // 防呆：如果为空或非数字，给默认值
+                    minVal = parseFloat(pcfMinInput.value);
+                    if(isNaN(minVal)) minVal = 0;
+                    
+                    maxVal = parseFloat(pcfMaxInput.value);
+                    if(isNaN(maxVal)) maxVal = 1.5;
+
                     if(minVal < 0) minVal = 0;
                     if(maxVal > 1.5) maxVal = 1.5;
                     if(minVal > maxVal) { maxVal = minVal; pcfMaxInput.value = maxVal.toFixed(2); }
+                    
                     pcfMinSlider.value = minVal;
                     pcfMaxSlider.value = maxVal;
                 }
@@ -427,28 +433,24 @@
                 renderApplication();
             }
 
-            // Real-time rendering enabled for both sliders and text inputs
             pcfMinSlider.addEventListener('input', () => syncValues('slider'));
             pcfMaxSlider.addEventListener('input', () => syncValues('slider'));
             
             pcfMinInput.addEventListener('change', () => syncValues('input'));
             pcfMaxInput.addEventListener('change', () => syncValues('input'));
-            // Trigger application render on keyup for instant keyboard typing feedback
-            pcfMinInput.addEventListener('keyup', () => syncValues('input'));
-            pcfMaxInput.addEventListener('keyup', () => syncValues('input'));
+            // 支持在输入框按回车键立即生效
+            pcfMinInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') syncValues('input'); });
+            pcfMaxInput.addEventListener('keyup', (e) => { if(e.key === 'Enter') syncValues('input'); });
 
 
-            // Summary Panel Collapse Toggle
             document.getElementById('summaryHeader').addEventListener('click', function() {
                 const content = document.getElementById('summaryContent');
                 const icon = document.getElementById('summaryToggleIcon');
-                
                 content.classList.toggle('collapsed');
                 icon.classList.toggle('collapsed');
                 this.classList.toggle('collapsed');
             });
 
-            // Reset Button
             document.getElementById('resetBtn').addEventListener('click', function() {
                 document.getElementById('speciesFilter').value = 'ALL';
                 pcfMinSlider.value = '0.00';
@@ -555,8 +557,12 @@
             filteredData = [];
             let selectedSpecies = document.getElementById('speciesFilter').value;
             
-            let minVal = parseFloat(document.getElementById('pcfMinSlider').value) || parseFloat(document.getElementById('pcfMinInput').value) || 0;
-            let maxVal = parseFloat(document.getElementById('pcfMaxSlider').value) || parseFloat(document.getElementById('pcfMaxInput').value) || 1.5;
+            // 安全读取数值，防止报错
+            let minVal = parseFloat(document.getElementById('pcfMin').value);
+            if(isNaN(minVal)) minVal = 0;
+            
+            let maxVal = parseFloat(document.getElementById('pcfMax').value);
+            if(isNaN(maxVal)) maxVal = 1.5;
             
             let isAtMax = (maxVal >= 1.5);
             let totalPcf = 0;
