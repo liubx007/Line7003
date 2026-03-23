@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Line 7003 Inspection Dashboard - Enterprise Edition</title>
+    <title>Line 7003 Inspection Dashboard</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -34,26 +34,25 @@
 
         /* --- Main Dashboard Layout --- */
         #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
-        #workspace { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-        #map-container { flex: 2; position: relative; border-bottom: 2px solid var(--border-color); }
+        #workspace { display: flex; flex-direction: column; flex: 1; overflow: hidden; position: relative; }
         #map { width: 100%; height: 100%; }
-        #table-container { flex: 1; background: white; overflow-y: auto; }
 
         /* --- Header & Controls --- */
-        #header { padding: 12px 20px; background-color: var(--bg-color); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 5px var(--shadow); z-index: 1000;}
-        .header-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--primary); letter-spacing: 0.5px;}
+        /* 强制单行，超出部分允许滚动 */
+        #header { padding: 10px 15px; background-color: var(--bg-color); display: flex; flex-wrap: nowrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 5px var(--shadow); z-index: 1000; overflow-x: auto; white-space: nowrap; gap: 15px;}
+        .header-title { margin: 0; font-size: 16px; font-weight: 600; color: var(--primary); letter-spacing: 0.5px;}
         
-        .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 13px; }
-        .control-group { display: flex; align-items: center; gap: 6px; background: #f8f9fa; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); }
-        select { padding: 4px 6px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; background: white; }
-        input[type="text"] { padding: 4px 8px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; width: 120px;}
+        .controls { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; font-size: 12px; }
+        .control-group { display: flex; align-items: center; gap: 6px; background: #f8f9fa; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); }
+        select { padding: 4px 6px; font-size: 12px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; background: white; }
+        input[type="text"] { padding: 4px 8px; font-size: 12px; border: 1px solid #ccc; border-radius: 4px; width: 100px;}
         
-        .slider-row { display: flex; align-items: center; gap: 6px; }
-        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 80px; }
-        .pcf-display { display: inline-block; width: 30px; font-weight: 600; color: var(--primary); text-align: right; }
+        .slider-row { display: flex; align-items: center; gap: 4px; }
+        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 60px; }
+        .pcf-display { display: inline-block; width: 28px; font-weight: 600; color: var(--primary); text-align: right; }
         
         /* --- Buttons --- */
-        .btn { background-color: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: 500; font-size: 13px; cursor: pointer; transition: background-color 0.2s; }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 5px 12px; border-radius: 4px; font-weight: 500; font-size: 12px; cursor: pointer; transition: background-color 0.2s; white-space: nowrap;}
         .btn:hover { background-color: var(--primary-hover); }
         .btn-toggle { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); }
         .btn-toggle:hover { background-color: #f1f2f6; }
@@ -62,20 +61,12 @@
         /* --- Summary Panel --- */
         #summaryPanel {
             position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95);
-            padding: 15px; border-radius: 4px; border: 1px solid var(--border-color);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 999; min-width: 160px; pointer-events: none;
+            padding: 12px 15px; border-radius: 4px; border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 999; min-width: 140px; pointer-events: none;
         }
         .summary-item { margin-bottom: 8px; font-size: 13px; color: #555; display: flex; justify-content: space-between; align-items: center;}
         .summary-item:last-child { margin-bottom: 0; }
-        .summary-val { font-weight: bold; font-size: 15px; color: var(--primary); }
-        .summary-warn { color: var(--danger); }
-
-        /* --- Data Table --- */
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-        th { background-color: #f8f9fa; padding: 10px 15px; font-weight: 600; color: #333; position: sticky; top: 0; border-bottom: 2px solid var(--border-color); z-index: 10; }
-        td { padding: 8px 15px; border-bottom: 1px solid #eee; color: #444; }
-        tr:hover { background-color: #f4f6f7; cursor: pointer; }
-        .table-high-pcf { color: var(--danger); font-weight: 600; }
+        .summary-val { font-weight: bold; font-size: 14px; color: var(--primary); margin-left: 15px;}
 
         /* --- Popups & Tooltips --- */
         .leaflet-popup-content-wrapper { border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; }
@@ -101,7 +92,7 @@
             <div class="controls">
                 <div class="control-group">
                     <input type="text" id="searchInput" placeholder="Search Pole ID...">
-                    <button class="btn" id="searchBtn" style="padding: 4px 10px;">Find</button>
+                    <button class="btn" id="searchBtn">Find</button>
                 </div>
 
                 <div class="control-group">
@@ -118,12 +109,12 @@
                 
                 <div class="control-group">
                     <div class="slider-row">
-                        <label>Min PCF:</label>
+                        <label>Min:</label>
                         <input type="range" id="pcfMin" min="0" max="1.0" step="0.01" value="0">
                         <span class="pcf-display" id="pcfMinValue">0.00</span>
                     </div>
-                    <div class="slider-row" style="margin-left: 10px;">
-                        <label>Max PCF:</label>
+                    <div class="slider-row" style="margin-left: 8px;">
+                        <label>Max:</label>
                         <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
                         <span class="pcf-display" id="pcfMaxValue">1.50</span>
                     </div>
@@ -137,30 +128,11 @@
         </div>
 
         <div id="workspace">
-            <div id="map-container">
-                <div id="map"></div>
-                <div id="summaryPanel">
-                    <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Data Summary</div>
-                    <div class="summary-item">Total Poles: <span class="summary-val" id="sumTotal">0</span></div>
-                    <div class="summary-item">Avg PCF: <span class="summary-val" id="sumAvg">0.00</span></div>
-                    <div class="summary-item">Critical (>0.5): <span class="summary-val summary-warn" id="sumWarn">0</span></div>
-                </div>
-            </div>
-            
-            <div id="table-container">
-                <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>Pole ID</th>
-                            <th>Species</th>
-                            <th>Moisture (%)</th>
-                            <th>Preservative</th>
-                            <th>PCF Concentration</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        </tbody>
-                </table>
+            <div id="map"></div>
+            <div id="summaryPanel">
+                <div style="font-weight: 600; margin-bottom: 8px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Data Summary</div>
+                <div class="summary-item">Total Poles: <span class="summary-val" id="sumTotal">0</span></div>
+                <div class="summary-item">Avg PCF: <span class="summary-val" id="sumAvg">0.00</span></div>
             </div>
         </div>
     </div>
@@ -198,7 +170,7 @@
         let heatLayer = null;
         let allData = [];
         let filteredData = [];
-        let markerRegistry = {}; // Store markers by Pole ID for interaction
+        let markerRegistry = {}; 
         
         let isColorMode = false;
         let isBarMode = false;
@@ -357,15 +329,6 @@
             }
         }
 
-        // Global function called by table rows
-        window.focusOnMap = function(poleId) {
-            let m = markerRegistry[poleId];
-            if(m) {
-                map.flyTo(m.getLatLng(), 17, {duration: 1.0});
-                m.openPopup();
-            }
-        };
-
         function renderApplication() {
             markersLayer.clearLayers();
             if (heatLayer) map.removeLayer(heatLayer);
@@ -379,9 +342,7 @@
             let bounds = [];
             let heatData = [];
             
-            // Statistics logic
             let totalPcf = 0;
-            let warnCount = 0;
 
             allData.forEach(data => {
                 let matchSp = (selectedSpecies === "ALL" || data.species === selectedSpecies);
@@ -390,7 +351,6 @@
                 if (matchSp && matchPcf) {
                     filteredData.push(data);
                     totalPcf += data.pcf;
-                    if (data.pcf > 0.5) warnCount++;
 
                     let markerColor = getMarkerColor(data.pcf);
                     
@@ -429,14 +389,12 @@
                     bounds.push([data.lat, data.lon]);
                     
                     if (isHeatMode) {
-                        // Intensity based on PCF
                         let intensity = Math.min(data.pcf / 1.0, 1.0);
                         heatData.push([data.lat, data.lon, intensity]);
                     }
                 }
             });
 
-            // Apply Heatmap if active
             if (isHeatMode && heatData.length > 0) {
                 heatLayer = L.heatLayer(heatData, {
                     radius: 20, blur: 15, maxZoom: 14, 
@@ -446,38 +404,10 @@
 
             if (bounds.length > 0) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
 
-            // Update Summary Panel
+            // Update Simplified Summary Panel
             let count = filteredData.length;
             document.getElementById('sumTotal').textContent = count;
             document.getElementById('sumAvg').textContent = count > 0 ? (totalPcf / count).toFixed(3) : "0.00";
-            document.getElementById('sumWarn').textContent = warnCount;
-
-            // Render Table
-            renderTable();
-        }
-
-        function renderTable() {
-            let tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            
-            // Sort by PCF descending for better analytical view
-            let sortedData = [...filteredData].sort((a, b) => b.pcf - a.pcf);
-
-            sortedData.forEach(data => {
-                let tr = document.createElement('tr');
-                tr.onclick = () => window.focusOnMap(data.id);
-                
-                let pcfClass = data.pcf > 0.5 ? 'table-high-pcf' : '';
-                
-                tr.innerHTML = `
-                    <td style="font-weight:600;">${data.id}</td>
-                    <td>${data.species}</td>
-                    <td>${data.moisture}</td>
-                    <td>${data.preservative}</td>
-                    <td class="${pcfClass}">${data.pcf}</td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
 
         function exportData() {
