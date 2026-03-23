@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line 7003 电线杆质检地图</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
+        #header { padding: 15px; background-color: #f8f9fa; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 20px; }
+        #map { flex: 1; width: 100%; }
+        select { padding: 8px; font-size: 14px; border-radius: 4px; }
+        .popup-content { font-size: 14px; line-height: 1.5; }
+        .highlight { color: #d9534f; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <h2 style="margin:0;">⚡ Line 7003 质检地图</h2>
+        <div>
+            <label for="speciesFilter"><strong>筛选树种:</strong></label>
+            <select id="speciesFilter">
+                <option value="ALL">显示全部</option>
+                </select>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script>
+        // 1. 初始化地图
+        const map = L.map('map').setView([45.5, -62.0], 9); // 默认中心点大致在加拿大新斯科舍省
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        let allData = [];
+        let markersLayer = L.layerGroup().addTo(map); // 创建一个图层专门放标记，方便清空
+
+        // 2. 清洗坐标的辅助函数 (处理如 "-63.30878" 和 "61.45893 W" 混用的情况)
+        function cleanCoord(coordStr) {
+            if (!coordStr) return null;
+            let str = String(coordStr).toUpperCase().trim();
+            let mult = (str.includes('S') || str.includes('W')) ? -1 : 1;
+            let match = str.match(/-?\d+\.\d+/);
+            if (match) {
+                let val = parseFloat(match[0]);
+                if (val > 0 && mult === -1) val = val * -1;
+                return val;
+            }
+            return null;
+        }
+
+        // 3. 加载并解析 CSV 文件
+        Papa.parse("Line 7003 Final Data.csv", {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: function(results) {
+                let data = results.data;
+                let speciesSet = new Set();
+
+                data.forEach(row => {
+                    let lat = cleanCoord(row['GPS Lat']);
+                    let lon = cleanCoord(row['GPS Long']);
+                    let species = row['Wood Species2'] ? row['Wood Species2'].trim() : 'Unknown';
+
+                    if (lat && lon) {
+                        row.cleanLat = lat;
+                        row.cleanLon = lon;
+                        row.cleanSpecies = species;
+                        allData.push(row);
+                        if (species !== 'Unknown' && species !== '') {
+                            speciesSet.add(species);
+                        }
+                    }
+                });
+
+                // 填充下拉菜单
+                const filterSelect = document.getElementById('speciesFilter');
+                speciesSet.forEach(species => {
+                    let option = document.createElement('option');
+                    option.value = species;
+                    option.textContent = species;
+                    filterSelect.appendChild(option);
+                });
+
+                // 初始渲染所有点
+                renderMarkers("ALL");
+
+                // 绑定下拉菜单筛选事件
+                filterSelect.addEventListener('change', function(e) {
+                    renderMarkers(e.target.value);
+                });
+            },
+            error: function(err) {
+                alert("读取 CSV 文件失败，请确保文件名与代码中一致，并且放置在同一目录下！");
+            }
+        });
+
+        // 4. 在地图上渲染标记点的函数
+        function renderMarkers(selectedSpecies) {
+            markersLayer.clearLayers(); // 清空旧标记
+            let bounds = [];
+
+            allData.forEach(row => {
+                if (selectedSpecies === "ALL" || row.cleanSpecies === selectedSpecies) {
+                    let pcfValue = row['Sawdust Progrqm PCF'] || 'N/A';
+                    let structureNum = row['Structure Number1'] || 'N/A';
+                    
+                    let popupHTML = `
+                        <div class="popup-content">
+                            <b>结构编号:</b> ${structureNum}<br>
+                            <b>树种:</b> ${row.cleanSpecies}<br>
+                            <b>防腐剂 (PCF):</b> <span class="highlight">${pcfValue}</span>
+                        </div>
+                    `;
+
+                    let marker = L.marker([row.cleanLat, row.cleanLon])
+                        .bindPopup(popupHTML)
+                        .bindTooltip(`杆号: ${structureNum}`); // 鼠标悬浮提示
+                    
+                    markersLayer.addLayer(marker);
+                    bounds.push([row.cleanLat, row.cleanLon]);
+                }
+            });
+
+            // 自动调整地图视野以包含所有可见的标记点
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        }
+    </script>
+</body>
+</html>
