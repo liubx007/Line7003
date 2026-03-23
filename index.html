@@ -3,102 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Line 7003 Pole Inspection Dashboard</title>
+    <title>Line 7003 Inspection Dashboard - Enterprise Edition</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
         :root {
             --bg-color: #ffffff;
             --text-color: #2c3e50;
-            --primary: #3498db;
-            --primary-hover: #2980b9;
-            --border-color: #e0e6ed;
-            --shadow: rgba(0, 0, 0, 0.08);
+            --primary: #2980b9;
+            --primary-hover: #21618c;
+            --secondary: #ecf0f1;
+            --border-color: #bdc3c7;
+            --danger: #c0392b;
+            --shadow: rgba(0, 0, 0, 0.1);
         }
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: #f8f9fa; color: var(--text-color); overflow: hidden; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--secondary); color: var(--text-color); overflow: hidden; }
         
-        /* --- Login Overlay Styling --- */
-        #loginOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: #f8f9fa; z-index: 9999;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .login-box {
-            background: white; padding: 40px; border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); text-align: center;
-            width: 320px; border: 1px solid var(--border-color);
-        }
-        .login-box h3 { margin-top: 0; color: var(--text-color); margin-bottom: 25px; font-size: 20px; font-weight: 600;}
-        .login-box input {
-            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc;
-            border-radius: 4px; font-size: 15px; box-sizing: border-box; outline: none; transition: border-color 0.2s;
-        }
+        /* --- Login Overlay --- */
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #f8f9fa; z-index: 9999; display: flex; justify-content: center; align-items: center; }
+        .login-box { background: white; padding: 40px; border-radius: 4px; box-shadow: 0 4px 15px var(--shadow); text-align: center; width: 320px; border: 1px solid var(--border-color); }
+        .login-box h3 { margin-top: 0; margin-bottom: 25px; font-size: 20px; font-weight: 600; color: #333;}
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 15px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
         .login-box input:focus { border-color: var(--primary); }
-        .error-msg { color: #e74c3c; font-size: 13px; margin-bottom: 15px; display: none; text-align: left;}
-        .login-box .btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; border-radius: 4px;}
+        .error-msg { color: var(--danger); font-size: 13px; margin-bottom: 15px; display: none; text-align: left;}
+        .login-box .btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; }
 
-        /* Main Dashboard */
+        /* --- Main Dashboard Layout --- */
         #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
+        #workspace { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        #map-container { flex: 2; position: relative; border-bottom: 2px solid var(--border-color); }
+        #map { width: 100%; height: 100%; }
+        #table-container { flex: 1; background: white; overflow-y: auto; }
 
-        /* Header Styling */
-        #header { padding: 15px 25px; background-color: var(--bg-color); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 10px var(--shadow); z-index: 1000; gap: 15px;}
-        .header-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-color); letter-spacing: 0.5px;}
+        /* --- Header & Controls --- */
+        #header { padding: 12px 20px; background-color: var(--bg-color); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 2px 5px var(--shadow); z-index: 1000;}
+        .header-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--primary); letter-spacing: 0.5px;}
         
-        /* Control Panel Styling */
-        .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; font-size: 13px; }
-        .control-group { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border-color); }
-        select { padding: 4px 8px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; background: white; }
+        .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 13px; }
+        .control-group { display: flex; align-items: center; gap: 6px; background: #f8f9fa; padding: 4px 10px; border-radius: 4px; border: 1px solid var(--border-color); }
+        select { padding: 4px 6px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; background: white; }
+        input[type="text"] { padding: 4px 8px; font-size: 13px; border: 1px solid #ccc; border-radius: 4px; width: 120px;}
         
-        /* Range Sliders */
-        .slider-container { display: flex; flex-direction: column; gap: 4px; }
-        .slider-row { display: flex; align-items: center; gap: 8px; }
-        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 100px; }
+        .slider-row { display: flex; align-items: center; gap: 6px; }
+        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 80px; }
         .pcf-display { display: inline-block; width: 30px; font-weight: 600; color: var(--primary); text-align: right; }
         
-        /* Buttons */
-        .btn { background-color: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 5px; }
-        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3); }
-        .btn:active { transform: translateY(0); }
+        /* --- Buttons --- */
+        .btn { background-color: var(--primary); color: white; border: none; padding: 6px 14px; border-radius: 4px; font-weight: 500; font-size: 13px; cursor: pointer; transition: background-color 0.2s; }
+        .btn:hover { background-color: var(--primary-hover); }
         .btn-toggle { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); }
         .btn-toggle:hover { background-color: #f1f2f6; }
-        .btn-toggle.active { background-color: #fff3e0; border-color: #ff9800; color: #e65100; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
-        .btn-toggle-bar { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); }
-        .btn-toggle-bar.active { background-color: #e8f4fd; border-color: #3498db; color: #1565c0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
+        .btn-toggle.active { background-color: #e8f4fd; border-color: var(--primary); color: var(--primary); font-weight: 600; }
         
-        /* Map Container */
-        #map { flex: 1; width: 100%; }
-        
-        /* Popup Styling */
-        .leaflet-popup-content-wrapper { border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(0,0,0,0.05); }
-        .popup-content { font-size: 13px; line-height: 1.6; color: #333; min-width: 180px; }
-        .popup-header { border-bottom: 1px solid #eee; padding-bottom: 6px; margin-bottom: 6px; font-weight: 600; color: var(--text-color); font-size: 14px; }
-        .highlight { color: #e74c3c; font-weight: bold; font-size: 14px;}
+        /* --- Summary Panel --- */
+        #summaryPanel {
+            position: absolute; top: 15px; right: 15px; background: rgba(255, 255, 255, 0.95);
+            padding: 15px; border-radius: 4px; border: 1px solid var(--border-color);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15); z-index: 999; min-width: 160px; pointer-events: none;
+        }
+        .summary-item { margin-bottom: 8px; font-size: 13px; color: #555; display: flex; justify-content: space-between; align-items: center;}
+        .summary-item:last-child { margin-bottom: 0; }
+        .summary-val { font-weight: bold; font-size: 15px; color: var(--primary); }
+        .summary-warn { color: var(--danger); }
 
-        /* Tooltip fix for bars */
-        .leaflet-tooltip { border-radius: 2px; border: 1px solid #ccc; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-weight: 600; font-size: 12px;}
+        /* --- Data Table --- */
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { background-color: #f8f9fa; padding: 10px 15px; font-weight: 600; color: #333; position: sticky; top: 0; border-bottom: 2px solid var(--border-color); z-index: 10; }
+        td { padding: 8px 15px; border-bottom: 1px solid #eee; color: #444; }
+        tr:hover { background-color: #f4f6f7; cursor: pointer; }
+        .table-high-pcf { color: var(--danger); font-weight: 600; }
+
+        /* --- Popups & Tooltips --- */
+        .leaflet-popup-content-wrapper { border-radius: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #ddd; }
+        .popup-header { border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 6px; font-weight: 600; font-size: 14px; }
+        .leaflet-tooltip { border-radius: 2px; border: 1px solid #ccc; font-weight: 600; font-size: 12px;}
     </style>
 </head>
 <body>
 
     <div id="loginOverlay">
         <div class="login-box">
-            <h3>System Access Required</h3>
+            <h3>System Access</h3>
             <input type="password" id="passwordInput" placeholder="Enter Authorization Code">
-            <div id="errorMsg" class="error-msg">Authentication failed. Please verify your code.</div>
+            <div id="errorMsg" class="error-msg">Authentication failed.</div>
             <button class="btn" id="loginBtn">Authenticate</button>
         </div>
     </div>
 
     <div id="mainDashboard">
         <div id="header">
-            <h2 class="header-title">Line 7003 Inspection Data</h2>
+            <h2 class="header-title">Line 7003 Analytical Dashboard</h2>
             
             <div class="controls">
                 <div class="control-group">
-                    <label for="speciesFilter"><strong>Species:</strong></label>
+                    <input type="text" id="searchInput" placeholder="Search Pole ID...">
+                    <button class="btn" id="searchBtn" style="padding: 4px 10px;">Find</button>
+                </div>
+
+                <div class="control-group">
+                    <label>Species:</label>
                     <select id="speciesFilter">
                         <option value="ALL">All Species</option>
                         <option value="Red Pine">Red Pine</option>
@@ -109,32 +116,58 @@
                     </select>
                 </div>
                 
-                <div class="control-group slider-container">
+                <div class="control-group">
                     <div class="slider-row">
-                        <label><strong>Min PCF:</strong></label>
+                        <label>Min PCF:</label>
                         <input type="range" id="pcfMin" min="0" max="1.0" step="0.01" value="0">
                         <span class="pcf-display" id="pcfMinValue">0.00</span>
                     </div>
-                    <div class="slider-row">
-                        <label><strong>Max PCF:</strong></label>
+                    <div class="slider-row" style="margin-left: 10px;">
+                        <label>Max PCF:</label>
                         <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
                         <span class="pcf-display" id="pcfMaxValue">1.50</span>
                     </div>
                 </div>
 
-                <button class="btn btn-toggle" id="colorToggleBtn">Color Gradient</button>
-                <button class="btn btn-toggle-bar" id="barChartBtn">3D Bar View</button>
-                <button class="btn" id="locationBtn">Get Location</button>
+                <button class="btn btn-toggle" id="colorToggleBtn">Gradient Map</button>
+                <button class="btn btn-toggle" id="barChartBtn">3D Bar Chart</button>
+                <button class="btn btn-toggle" id="heatMapBtn">Heatmap</button>
                 <button class="btn" id="exportBtn">Export Data</button>
             </div>
         </div>
 
-        <div id="map"></div>
+        <div id="workspace">
+            <div id="map-container">
+                <div id="map"></div>
+                <div id="summaryPanel">
+                    <div style="font-weight: 600; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Data Summary</div>
+                    <div class="summary-item">Total Poles: <span class="summary-val" id="sumTotal">0</span></div>
+                    <div class="summary-item">Avg PCF: <span class="summary-val" id="sumAvg">0.00</span></div>
+                    <div class="summary-item">Critical (>0.5): <span class="summary-val summary-warn" id="sumWarn">0</span></div>
+                </div>
+            </div>
+            
+            <div id="table-container">
+                <table id="dataTable">
+                    <thead>
+                        <tr>
+                            <th>Pole ID</th>
+                            <th>Species</th>
+                            <th>Moisture (%)</th>
+                            <th>Preservative</th>
+                            <th>PCF Concentration</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
         // ==========================================
-        // Password setup
+        // Security Settings
         const CORRECT_PASSWORD = "7003"; 
         // ==========================================
 
@@ -157,22 +190,24 @@
         }
 
         loginBtn.addEventListener('click', attemptLogin);
-        passwordInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') attemptLogin();
-        });
+        passwordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') attemptLogin(); });
 
-        // Core variables
-        let map, markersLayer, userLocationMarker;
+        // Core Application State
+        let map;
+        let markersLayer;
+        let heatLayer = null;
         let allData = [];
-        let filteredDataForExport = [];
-        let isColorGradientMode = false;
-        let isBarChartMode = false;
+        let filteredData = [];
+        let markerRegistry = {}; // Store markers by Pole ID for interaction
+        
+        let isColorMode = false;
+        let isBarMode = false;
+        let isHeatMode = false;
 
         function initializeDashboard() {
             map = L.map('map').setView([45.5, -62.0], 9);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
-                maxZoom: 19
+                attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
             }).addTo(map);
 
             markersLayer = L.layerGroup().addTo(map);
@@ -180,22 +215,22 @@
             setupEventListeners();
         }
 
-        function cleanCoord(coordStr) {
-            if (!coordStr) return null;
-            let str = String(coordStr).toUpperCase().trim();
-            let mult = (str.includes('S') || str.includes('W')) ? -1 : 1;
-            let match = str.match(/-?\d+\.\d+/);
+        function cleanCoord(str) {
+            if (!str) return null;
+            let val = String(str).toUpperCase().trim();
+            let mult = (val.includes('S') || val.includes('W')) ? -1 : 1;
+            let match = val.match(/-?\d+\.\d+/);
             if (match) {
-                let val = parseFloat(match[0]);
-                if (val > 0 && mult === -1) val = val * -1;
-                return val;
+                let n = parseFloat(match[0]);
+                if (n > 0 && mult === -1) n = n * -1;
+                return n;
             }
             return null;
         }
 
-        function standardizeSpecies(rawSpecies) {
-            if (!rawSpecies) return 'Other';
-            let s = rawSpecies.trim().toUpperCase();
+        function standardizeSpecies(s) {
+            if (!s) return 'Other';
+            s = s.trim().toUpperCase();
             if (['RD', 'RP', 'D', 'RED PINE'].includes(s)) return 'Red Pine';
             if (['WRC', 'WRC?', 'CEDER', 'CEDAR'].includes(s)) return 'West Red Cedar';
             if (['YP', 'SYP', 'SOUTH YELLOW PINE'].includes(s)) return 'South Yellow Pine';
@@ -204,34 +239,34 @@
         }
 
         function getMarkerColor(pcf) {
-            if (!isColorGradientMode && !isBarChartMode) return "#3498db"; 
-            if (pcf <= 0) return "#bdc3c7"; 
+            if (!isColorMode && !isBarMode) return "#2980b9"; 
+            if (pcf <= 0) return "#95a5a6"; 
             let ratio = Math.min(pcf, 0.5) / 0.5;
             let hue = 60 - (ratio * 60); 
-            return `hsl(${hue}, 100%, 50%)`;
+            return `hsl(${hue}, 100%, 45%)`;
         }
 
         function loadData() {
             Papa.parse("Line 7003 Final Data.csv", {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
+                download: true, header: true, skipEmptyLines: true,
                 complete: function(results) {
                     let rawData = results.data;
-                    let ref324_2_Lat = null; let ref324_2_Lon = null;
+                    let refLat = null, refLon = null;
 
+                    // Pass 1: Handle 324 coordinate fix
                     rawData.forEach(row => {
                         if (String(row['Structure Number1']).trim() === '324 (2)') {
-                            ref324_2_Lat = row['GPS Lat']; ref324_2_Lon = row['GPS Long'];
+                            refLat = row['GPS Lat']; refLon = row['GPS Long'];
                         }
                     });
 
                     let coordOccurrences = {}; 
 
+                    // Pass 2: Clean and structure
                     rawData.forEach(row => {
                         let structNum = String(row['Structure Number1']).trim();
-                        if (structNum === '324 (3)' && ref324_2_Lat) {
-                            row['GPS Lat'] = ref324_2_Lat; row['GPS Long'] = ref324_2_Lon;
+                        if (structNum === '324 (3)' && refLat) {
+                            row['GPS Lat'] = refLat; row['GPS Long'] = refLon;
                         }
 
                         let lat = cleanCoord(row['GPS Lat']);
@@ -245,187 +280,215 @@
                         }
 
                         if (lat !== null && lon !== null) {
-                            let coordKey = `${lat.toFixed(5)},${lon.toFixed(5)}`;
-                            if (coordOccurrences[coordKey] !== undefined) {
-                                coordOccurrences[coordKey]++;
-                                lat += 0.00006 * coordOccurrences[coordKey]; 
-                                lon += 0.00006 * coordOccurrences[coordKey];
+                            let key = `${lat.toFixed(5)},${lon.toFixed(5)}`;
+                            if (coordOccurrences[key] !== undefined) {
+                                coordOccurrences[key]++;
+                                lat += 0.00006 * coordOccurrences[key]; 
+                                lon += 0.00006 * coordOccurrences[key];
                             } else {
-                                coordOccurrences[coordKey] = 0;
+                                coordOccurrences[key] = 0;
                             }
 
-                            row.cleanLat = lat;
-                            row.cleanLon = lon;
-                            row.stdSpecies = standardizeSpecies(row['Wood Species2']);
-                            row.pcfValue = pcfValue;
-                            allData.push(row);
+                            allData.push({
+                                original: row,
+                                id: structNum,
+                                lat: lat,
+                                lon: lon,
+                                species: standardizeSpecies(row['Wood Species2']),
+                                pcf: pcfValue,
+                                moisture: row['Moisture %'] || 'N/A',
+                                preservative: row['Preservative3'] || 'N/A'
+                            });
                         }
                     });
-                    renderMap();
+                    renderApplication();
                 }
             });
         }
 
         function setupEventListeners() {
-            const speciesFilter = document.getElementById('speciesFilter');
-            const pcfMin = document.getElementById('pcfMin');
-            const pcfMax = document.getElementById('pcfMax');
-            const pcfMinValue = document.getElementById('pcfMinValue');
-            const pcfMaxValue = document.getElementById('pcfMaxValue');
-            const colorToggleBtn = document.getElementById('colorToggleBtn');
-            const barChartBtn = document.getElementById('barChartBtn');
-            const locationBtn = document.getElementById('locationBtn');
-            const exportBtn = document.getElementById('exportBtn');
-
-            speciesFilter.addEventListener('change', renderMap);
+            document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            pcfMin.addEventListener('input', function(e) {
-                if (parseFloat(pcfMin.value) > parseFloat(pcfMax.value)) pcfMax.value = pcfMin.value;
-                pcfMinValue.textContent = parseFloat(pcfMin.value).toFixed(2);
-                pcfMaxValue.textContent = parseFloat(pcfMax.value).toFixed(2);
-                renderMap();
+            document.getElementById('pcfMin').addEventListener('input', function() {
+                if (parseFloat(this.value) > parseFloat(document.getElementById('pcfMax').value)) document.getElementById('pcfMax').value = this.value;
+                document.getElementById('pcfMinValue').textContent = parseFloat(this.value).toFixed(2);
+                document.getElementById('pcfMaxValue').textContent = parseFloat(document.getElementById('pcfMax').value).toFixed(2);
+                renderApplication();
             });
             
-            pcfMax.addEventListener('input', function(e) {
-                if (parseFloat(pcfMax.value) < parseFloat(pcfMin.value)) pcfMin.value = pcfMax.value;
-                pcfMinValue.textContent = parseFloat(pcfMin.value).toFixed(2);
-                pcfMaxValue.textContent = parseFloat(pcfMax.value).toFixed(2);
-                renderMap();
+            document.getElementById('pcfMax').addEventListener('input', function() {
+                if (parseFloat(this.value) < parseFloat(document.getElementById('pcfMin').value)) document.getElementById('pcfMin').value = this.value;
+                document.getElementById('pcfMinValue').textContent = parseFloat(document.getElementById('pcfMin').value).toFixed(2);
+                document.getElementById('pcfMaxValue').textContent = parseFloat(this.value).toFixed(2);
+                renderApplication();
             });
 
-            colorToggleBtn.addEventListener('click', function() {
-                isColorGradientMode = !isColorGradientMode;
-                this.classList.toggle('active');
-                renderMap();
+            document.getElementById('colorToggleBtn').addEventListener('click', function() {
+                isColorMode = !isColorMode; this.classList.toggle('active'); renderApplication();
             });
 
-            barChartBtn.addEventListener('click', function() {
-                isBarChartMode = !isBarChartMode;
-                this.classList.toggle('active');
-                renderMap();
+            document.getElementById('barChartBtn').addEventListener('click', function() {
+                isBarMode = !isBarMode; this.classList.toggle('active'); renderApplication();
             });
 
-            exportBtn.addEventListener('click', exportToCSV);
+            document.getElementById('heatMapBtn').addEventListener('click', function() {
+                isHeatMode = !isHeatMode; this.classList.toggle('active'); renderApplication();
+            });
 
-            locationBtn.addEventListener('click', function() {
-                if (!navigator.geolocation) { alert("Geolocation is not supported by your browser."); return; }
-                let originalText = this.innerHTML; this.innerHTML = "Locating...";
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        locationBtn.innerHTML = originalText;
-                        let lat = position.coords.latitude; let lon = position.coords.longitude;
-                        if (userLocationMarker) map.removeLayer(userLocationMarker);
-                        userLocationMarker = L.circleMarker([lat, lon], { radius: 5, fillColor: "#007bff", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 }).addTo(map);
-                        userLocationMarker.bindTooltip("Current Location").openTooltip();
-                        map.flyTo([lat, lon], 14, { duration: 1.5 });
-                    }, 
-                    function(error) { locationBtn.innerHTML = originalText; alert("Unable to retrieve location."); }, 
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                );
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+
+            document.getElementById('searchBtn').addEventListener('click', searchPole);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchPole();
             });
         }
 
-        function renderMap() {
+        function searchPole() {
+            let query = document.getElementById('searchInput').value.trim().toUpperCase();
+            if (!query) return;
+
+            let target = filteredData.find(d => d.id.toUpperCase().includes(query));
+            if (target && markerRegistry[target.id]) {
+                let m = markerRegistry[target.id];
+                map.flyTo(m.getLatLng(), 18, {duration: 1.5});
+                setTimeout(() => m.openPopup(), 1500);
+            } else {
+                alert("Pole ID not found in current filtered dataset.");
+            }
+        }
+
+        // Global function called by table rows
+        window.focusOnMap = function(poleId) {
+            let m = markerRegistry[poleId];
+            if(m) {
+                map.flyTo(m.getLatLng(), 17, {duration: 1.0});
+                m.openPopup();
+            }
+        };
+
+        function renderApplication() {
             markersLayer.clearLayers();
-            filteredDataForExport = [];
+            if (heatLayer) map.removeLayer(heatLayer);
+            markerRegistry = {};
+            filteredData = [];
             
             let selectedSpecies = document.getElementById('speciesFilter').value;
             let minVal = parseFloat(document.getElementById('pcfMin').value);
             let maxVal = parseFloat(document.getElementById('pcfMax').value);
+            
             let bounds = [];
+            let heatData = [];
+            
+            // Statistics logic
+            let totalPcf = 0;
+            let warnCount = 0;
 
-            allData.forEach(row => {
-                let matchSpecies = (selectedSpecies === "ALL" || row.stdSpecies === selectedSpecies);
-                let matchPcf = (row.pcfValue >= minVal && row.pcfValue <= maxVal);
+            allData.forEach(data => {
+                let matchSp = (selectedSpecies === "ALL" || data.species === selectedSpecies);
+                let matchPcf = (data.pcf >= minVal && data.pcf <= maxVal);
 
-                if (matchSpecies && matchPcf) {
-                    filteredDataForExport.push(row);
-                    let structureNum = row['Structure Number1'] || 'N/A';
-                    let displayPcf = row['Sawdust Progrqm PCF'] || '0';
-                    let markerColor = getMarkerColor(row.pcfValue);
+                if (matchSp && matchPcf) {
+                    filteredData.push(data);
+                    totalPcf += data.pcf;
+                    if (data.pcf > 0.5) warnCount++;
+
+                    let markerColor = getMarkerColor(data.pcf);
                     
                     let popupHTML = `
                         <div class="popup-content">
-                            <div class="popup-header">Structure: ${structureNum}</div>
-                            <b>Species:</b> ${row.stdSpecies}<br>
-                            <b>Moisture:</b> ${row['Moisture %'] || 'N/A'}%<br>
-                            <b>PCF Conc:</b> <span class="highlight" style="color:${markerColor !== '#3498db' ? markerColor : '#e74c3c'}">${displayPcf}</span>
+                            <div class="popup-header">Pole ID: ${data.id}</div>
+                            Species: ${data.species}<br>
+                            Preservative: ${data.preservative}<br>
+                            Moisture: ${data.moisture}%<br>
+                            PCF Concentration: <span style="font-weight:bold; color:${data.pcf > 0.5 ? '#c0392b' : '#333'}">${data.pcf}</span>
                         </div>
                     `;
 
-                    if (isBarChartMode) {
-                        let barHeight = Math.max((row.pcfValue / 1.0) * 80, 6); 
-                        
+                    let marker;
+                    if (isBarMode && !isHeatMode) {
+                        let h = Math.max((data.pcf / 1.0) * 80, 6); 
                         let barHtml = `
-                            <div style="
-                                width: 12px;
-                                height: ${barHeight}px;
-                                background-color: ${markerColor};
-                                background-image: linear-gradient(to right, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0.2) 100%);
-                                box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-                                border: 1px solid rgba(255,255,255,0.6);
-                                border-bottom: 1px solid #333;
-                                border-radius: 2px 2px 1px 1px;
-                            "></div>
+                            <div style="width:12px; height:${h}px; background-color:${markerColor}; 
+                            box-shadow: 2px 2px 5px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.4); border-bottom: 1px solid #333;"></div>
                         `;
+                        let barIcon = L.divIcon({ html: barHtml, className: '', iconSize: [12, h], iconAnchor: [6, h], popupAnchor: [0, -h] });
+                        marker = L.marker([data.lat, data.lon], { icon: barIcon });
+                    } else if (!isHeatMode) {
+                        marker = L.circleMarker([data.lat, data.lon], { radius: 6, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.9 });
+                        marker.on('mouseover', function () { this.setStyle({ radius: 9, weight: 2 }); });
+                        marker.on('mouseout', function () { this.setStyle({ radius: 6, weight: 1 }); });
+                    }
 
-                        let barIcon = L.divIcon({
-                            html: barHtml,
-                            className: '',
-                            iconSize: [12, barHeight],
-                            iconAnchor: [6, barHeight],
-                            popupAnchor: [0, -barHeight]
-                        });
-
-                        let marker = L.marker([row.cleanLat, row.cleanLon], { icon: barIcon });
+                    if (!isHeatMode) {
                         marker.bindPopup(popupHTML);
-                        marker.bindTooltip(`Pole: ${structureNum} | PCF: ${displayPcf}`, { direction: 'top', offset: [0, -barHeight] });
-                        
+                        marker.bindTooltip(data.id, { direction: 'top', offset: [0, isBarMode ? -10 : -5] });
                         markersLayer.addLayer(marker);
-                        bounds.push([row.cleanLat, row.cleanLon]);
+                        markerRegistry[data.id] = marker;
+                    }
 
-                    } else {
-                        let marker = L.circleMarker([row.cleanLat, row.cleanLon], {
-                            radius: 6, fillColor: markerColor, color: "#ffffff", weight: 1.5, opacity: 1, fillOpacity: 0.85
-                        });
-
-                        marker.on('mouseover', function (e) {
-                            this.openTooltip();
-                            this.setStyle({ radius: 9, weight: 2, fillOpacity: 1 });
-                        });
-                        marker.on('mouseout', function (e) {
-                            this.closeTooltip();
-                            this.setStyle({ radius: 6, weight: 1.5, fillOpacity: 0.85 });
-                        });
-
-                        marker.bindPopup(popupHTML);
-                        marker.bindTooltip(`Pole: ${structureNum}`, { direction: 'top', offset: [0, -8] });
-                        
-                        markersLayer.addLayer(marker);
-                        bounds.push([row.cleanLat, row.cleanLon]);
+                    bounds.push([data.lat, data.lon]);
+                    
+                    if (isHeatMode) {
+                        // Intensity based on PCF
+                        let intensity = Math.min(data.pcf / 1.0, 1.0);
+                        heatData.push([data.lat, data.lon, intensity]);
                     }
                 }
             });
 
-            if (bounds.length > 0 && !userLocationMarker) {
-                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
+            // Apply Heatmap if active
+            if (isHeatMode && heatData.length > 0) {
+                heatLayer = L.heatLayer(heatData, {
+                    radius: 20, blur: 15, maxZoom: 14, 
+                    gradient: {0.2: 'blue', 0.4: 'cyan', 0.6: 'lime', 0.8: 'yellow', 1.0: 'red'}
+                }).addTo(map);
             }
+
+            if (bounds.length > 0) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+
+            // Update Summary Panel
+            let count = filteredData.length;
+            document.getElementById('sumTotal').textContent = count;
+            document.getElementById('sumAvg').textContent = count > 0 ? (totalPcf / count).toFixed(3) : "0.00";
+            document.getElementById('sumWarn').textContent = warnCount;
+
+            // Render Table
+            renderTable();
         }
 
-        function exportToCSV() {
-            if (filteredDataForExport.length === 0) { alert("No data available to export based on current filters."); return; }
-            const cleanData = filteredDataForExport.map(row => {
-                const newRow = Object.assign({}, row);
-                delete newRow.cleanLat; delete newRow.cleanLon; delete newRow.stdSpecies; delete newRow.pcfValue;
-                return newRow;
+        function renderTable() {
+            let tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            // Sort by PCF descending for better analytical view
+            let sortedData = [...filteredData].sort((a, b) => b.pcf - a.pcf);
+
+            sortedData.forEach(data => {
+                let tr = document.createElement('tr');
+                tr.onclick = () => window.focusOnMap(data.id);
+                
+                let pcfClass = data.pcf > 0.5 ? 'table-high-pcf' : '';
+                
+                tr.innerHTML = `
+                    <td style="font-weight:600;">${data.id}</td>
+                    <td>${data.species}</td>
+                    <td>${data.moisture}</td>
+                    <td>${data.preservative}</td>
+                    <td class="${pcfClass}">${data.pcf}</td>
+                `;
+                tbody.appendChild(tr);
             });
-            const csvString = Papa.unparse(cleanData);
-            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
+        }
+
+        function exportData() {
+            if (filteredData.length === 0) return alert("No data to export.");
+            let exportArr = filteredData.map(d => d.original);
+            let csv = Papa.unparse(exportArr);
+            let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            let link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = "Line_7003_Export.csv";
-            document.body.appendChild(link);
-            link.click(); document.body.removeChild(link);
+            link.download = "Line_7003_Analytical_Export.csv";
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
     </script>
 </body>
