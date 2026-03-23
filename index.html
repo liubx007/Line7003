@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
@@ -20,6 +21,7 @@
             --primary: #0052cc;
             --primary-hover: #0043a6;
             --danger: #de3618;
+            --success: #2ecc71;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
             --radius: 4px;
@@ -67,7 +69,9 @@
         .divider { width: 1px; height: 20px; background-color: var(--border-color); margin: 0 4px; }
 
         /* --- Buttons --- */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: var(--radius); font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; }
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: var(--radius); font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; gap: 6px; }
+        .btn-icon-only { padding: 6px 12px; font-size: 15px; } /* For icon-only buttons */
+        
         .btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
         .btn-primary:hover { background-color: var(--primary-hover); }
         
@@ -135,7 +139,7 @@
             <div class="header-middle">
                 <div class="control-group">
                     <input type="text" id="searchInput" class="form-control" placeholder="Search Pole ID">
-                    <button class="btn btn-outline" id="searchBtn">Find</button>
+                    <button class="btn btn-outline btn-icon-only" id="searchBtn" title="Search Pole"><i class="fa-solid fa-magnifying-glass"></i></button>
                 </div>
 
                 <div class="divider"></div>
@@ -171,15 +175,15 @@
 
                 <div class="divider"></div>
 
-                <button class="btn btn-outline" id="colorToggleBtn">Gradient Map</button>
-                <button class="btn btn-outline" id="barChartBtn">3D Bar Chart</button>
-                <button class="btn btn-outline" id="heatMapBtn">Heatmap</button>
+                <button class="btn btn-outline" id="colorToggleBtn"><i class="fa-solid fa-palette"></i> Gradient</button>
+                <button class="btn btn-outline" id="barChartBtn"><i class="fa-solid fa-chart-column"></i> 3D Bar</button>
+                <button class="btn btn-outline" id="heatMapBtn"><i class="fa-solid fa-fire"></i> Heatmap</button>
             </div>
 
             <div class="header-bottom">
-                <button class="btn btn-outline" id="tableViewBtn">Table View</button>
-                <button class="btn btn-outline" id="locationBtn">Get Location</button>
-                <button class="btn btn-primary" id="exportBtn">Export Data</button>
+                <button class="btn btn-outline btn-icon-only" id="tableViewBtn" title="Table View"><i class="fa-solid fa-table"></i></button>
+                <button class="btn btn-outline btn-icon-only" id="locationBtn" title="Get My Location"><i class="fa-solid fa-location-crosshairs"></i></button>
+                <button class="btn btn-primary btn-icon-only" id="exportBtn" title="Export CSV Data"><i class="fa-solid fa-file-csv"></i></button>
             </div>
         </div>
 
@@ -266,7 +270,7 @@
         let isTableMode = false;
 
         function initializeDashboard() {
-            // Restore Original OpenStreetMap Tile Layer
+            // Original OpenStreetMap Base
             map = L.map('map').setView([45.5, -62.0], 9);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
@@ -310,7 +314,6 @@
 
         // Custom Sort Logic for Pole IDs (Natural Sort)
         function parsePoleId(idStr) {
-            // Match pattern like "324" or "324 (3)"
             let match = idStr.match(/(\d+)(?:\s*\(\s*(\d+)\s*\))?/);
             if (!match) return [999999, 0];
             return [parseInt(match[1], 10), match[2] ? parseInt(match[2], 10) : 0];
@@ -413,7 +416,7 @@
                 isHeatMode = !isHeatMode; this.classList.toggle('active'); renderApplication();
             });
 
-            // View Switcher
+            // View Switcher (Icon Toggle)
             document.getElementById('tableViewBtn').addEventListener('click', function() {
                 isTableMode = !isTableMode;
                 let mapView = document.getElementById('mapView');
@@ -421,12 +424,14 @@
                 
                 if (isTableMode) {
                     this.classList.add('active');
-                    this.textContent = 'Map View';
+                    this.innerHTML = '<i class="fa-solid fa-map"></i>'; // Change icon to map
+                    this.title = 'Map View';
                     mapView.classList.remove('active');
                     tableView.classList.add('active');
                 } else {
                     this.classList.remove('active');
-                    this.textContent = 'Table View';
+                    this.innerHTML = '<i class="fa-solid fa-table"></i>'; // Change icon to table
+                    this.title = 'Table View';
                     tableView.classList.remove('active');
                     mapView.classList.add('active');
                     map.invalidateSize(); 
@@ -446,21 +451,24 @@
                 
                 if(isTableMode) document.getElementById('tableViewBtn').click();
 
-                let originalText = this.innerHTML; this.innerHTML = "Locating...";
+                let originalHTML = this.innerHTML; 
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; // Loading spinner icon
+                
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
-                        document.getElementById('locationBtn').innerHTML = originalText;
+                        document.getElementById('locationBtn').innerHTML = originalHTML;
                         let lat = position.coords.latitude; let lon = position.coords.longitude;
                         if (userLocationMarker) map.removeLayer(userLocationMarker);
                         
+                        // Distinct Emerald Green color for My Location
                         userLocationMarker = L.circleMarker([lat, lon], { 
-                            radius: 6, fillColor: "#0052cc", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 
+                            radius: 8, fillColor: "var(--success)", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 
                         }).addTo(map);
                         
                         userLocationMarker.bindTooltip("Current Location").openTooltip();
                         map.flyTo([lat, lon], 14, { duration: 1.5 });
                     }, 
-                    function(error) { document.getElementById('locationBtn').innerHTML = originalText; alert("Unable to retrieve location. Please check browser permissions."); }, 
+                    function(error) { document.getElementById('locationBtn').innerHTML = originalHTML; alert("Unable to retrieve location. Please check browser permissions."); }, 
                     { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             });
@@ -520,12 +528,12 @@
             
             filteredData.forEach(d => {
                 let binIdx = Math.floor((d.pcf / maxPcfScale) * binCount);
-                if (binIdx >= binCount) binIdx = binCount - 1; // Cap extreme values to the last bin
+                if (binIdx >= binCount) binIdx = binCount - 1; 
                 if (binIdx < 0) binIdx = 0;
                 bins[binIdx]++;
             });
 
-            let maxFreq = Math.max(...bins, 1); // Avoid division by zero
+            let maxFreq = Math.max(...bins, 1); 
             let chartContainer = document.getElementById('miniChart');
             chartContainer.innerHTML = '';
 
@@ -536,10 +544,8 @@
                 let bar = document.createElement('div');
                 bar.className = 'chart-bar';
                 bar.style.height = heightPct + '%';
-                // Tooltip for each bar
                 bar.title = `PCF ~${binStart}: ${count} poles`;
                 
-                // Colorize critical bins (PCF > 0.5) if Color Mode is active
                 if (isColorMode && parseFloat(binStart) >= 0.5) {
                     bar.style.backgroundColor = 'var(--danger)';
                 }
@@ -613,7 +619,7 @@
             let tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             
-            // Custom Natural Sort by Pole ID Ascending (e.g., "1 (1)" before "10 (1)")
+            // Custom Natural Sort by Pole ID Ascending
             let sortedData = [...filteredData].sort((a, b) => {
                 let aParsed = parsePoleId(a.id);
                 let bParsed = parsePoleId(b.id);
