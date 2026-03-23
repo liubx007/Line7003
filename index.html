@@ -12,7 +12,6 @@
 
     <style>
         :root {
-            /* Enterprise Color Palette */
             --bg-main: #f4f6f8;
             --bg-panel: #ffffff;
             --text-main: #202b36;
@@ -21,10 +20,9 @@
             --primary: #0052cc;
             --primary-hover: #0043a6;
             --danger: #de3618;
-            --danger-bg: #ffe9e5;
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
-            --radius: 6px;
+            --radius: 4px;
         }
 
         body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; }
@@ -35,38 +33,48 @@
         .login-box h3 { margin-top: 0; margin-bottom: 24px; font-size: 20px; font-weight: 600; color: var(--text-main); }
         .login-box input { width: 100%; padding: 10px 12px; margin-bottom: 16px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 14px; box-sizing: border-box; outline: none; transition: all 0.2s; }
         .login-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1); }
-        .error-msg { color: var(--danger); font-size: 13px; margin-bottom: 16px; display: none; text-align: left; background: var(--danger-bg); padding: 8px; border-radius: 4px; border: 1px solid #f9c2b7;}
+        .error-msg { color: var(--danger); font-size: 13px; margin-bottom: 16px; display: none; text-align: left; background: #ffe9e5; padding: 8px; border-radius: 4px; border: 1px solid #f9c2b7;}
         .login-box .btn-primary { width: 100%; justify-content: center; padding: 10px; font-size: 15px; }
 
         /* --- Main Layout --- */
         #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
         
-        /* --- Two-Row Header --- */
+        /* --- Three-Row Header --- */
         #header { background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-sm); z-index: 1000; display: flex; flex-direction: column; }
-        .header-top { padding: 16px 24px; border-bottom: 1px solid var(--border-color); }
+        
+        /* Row 1: Title */
+        .header-top { padding: 12px 24px; border-bottom: 1px solid var(--border-color); }
         .header-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-main); letter-spacing: 0.3px; }
         
-        .header-bottom { padding: 12px 24px; display: flex; flex-wrap: nowrap; align-items: center; gap: 16px; overflow-x: auto; white-space: nowrap; }
+        /* Row 2: Filters & Map Toggles */
+        .header-middle { padding: 10px 24px; display: flex; flex-wrap: nowrap; align-items: center; gap: 16px; border-bottom: 1px solid var(--border-color); overflow-x: auto; white-space: nowrap; }
+        
+        /* Row 3: Actions */
+        .header-bottom { padding: 8px 24px; display: flex; align-items: center; gap: 12px; background-color: #f9fafb; }
         
         /* --- Controls & Inputs --- */
         .control-group { display: flex; align-items: center; gap: 8px; }
         .control-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
-        .form-control { padding: 6px 10px; font-size: 13px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--bg-panel); color: var(--text-main); outline: none; transition: all 0.2s; }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1); }
-        input[type="number"].form-control { width: 70px; }
+        .form-control { padding: 4px 8px; font-size: 13px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--bg-panel); outline: none; transition: all 0.2s; }
+        .form-control:focus { border-color: var(--primary); }
         input[type="text"].form-control { width: 140px; }
         
-        .divider { width: 1px; height: 24px; background-color: var(--border-color); margin: 0 4px; }
+        /* Sliders */
+        .slider-row { display: flex; align-items: center; gap: 6px; }
+        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 80px; }
+        .pcf-display { display: inline-block; width: 32px; font-weight: 600; color: var(--primary); text-align: right; font-size: 13px; }
+        
+        .divider { width: 1px; height: 20px; background-color: var(--border-color); margin: 0 4px; }
 
         /* --- Buttons --- */
         .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: var(--radius); font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; }
         .btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
-        .btn-primary:hover { background-color: var(--primary-hover); border-color: var(--primary-hover); box-shadow: var(--shadow-sm); }
+        .btn-primary:hover { background-color: var(--primary-hover); }
         
         .btn-outline { background-color: var(--bg-panel); color: var(--text-main); border-color: var(--border-color); }
         .btn-outline:hover { background-color: var(--bg-main); border-color: #c4cdd5; }
         .btn-outline.active { background-color: #ebf5ff; border-color: var(--primary); color: var(--primary); font-weight: 600; }
-        
+
         /* --- Workspace & Views --- */
         #workspace { flex: 1; position: relative; overflow: hidden; display: flex; }
         .view-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; display: flex; flex-direction: column; }
@@ -74,17 +82,23 @@
         
         #map { width: 100%; height: 100%; background-color: #e3e9f0; }
 
-        /* --- Summary Overlay on Map --- */
+        /* --- Summary Overlay on Map with Mini-Chart --- */
         #summaryPanel {
             position: absolute; bottom: 24px; left: 24px; background: rgba(255, 255, 255, 0.95);
             padding: 16px; border-radius: var(--radius); border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md); z-index: 999; min-width: 180px; pointer-events: none;
+            box-shadow: var(--shadow-md); z-index: 999; width: 220px; pointer-events: none;
             backdrop-filter: blur(4px);
         }
-        .summary-title { font-weight: 600; font-size: 14px; margin-bottom: 12px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; }
+        .summary-title { font-weight: 600; font-size: 13px; margin-bottom: 10px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; }
         .summary-item { margin-bottom: 8px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
-        .summary-item:last-child { margin-bottom: 0; }
-        .summary-val { font-weight: 600; font-size: 15px; color: var(--text-main); }
+        .summary-val { font-weight: 600; font-size: 14px; color: var(--text-main); }
+        
+        /* Mini Histogram Container */
+        .chart-container { margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 10px; }
+        .chart-title { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-align: center; }
+        .mini-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 40px; gap: 2px; }
+        .chart-bar { flex: 1; background-color: var(--primary); border-radius: 2px 2px 0 0; min-height: 1px; transition: height 0.2s ease; opacity: 0.8; }
+        .chart-axis { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
 
         /* --- Table View --- */
         #tableContainer { width: 100%; height: 100%; overflow: auto; background: var(--bg-panel); padding: 0; }
@@ -118,8 +132,7 @@
                 <h2 class="header-title">Line 7003 Analytical Dashboard</h2>
             </div>
             
-            <div class="header-bottom">
-                
+            <div class="header-middle">
                 <div class="control-group">
                     <input type="text" id="searchInput" class="form-control" placeholder="Search Pole ID">
                     <button class="btn btn-outline" id="searchBtn">Find</button>
@@ -142,12 +155,18 @@
                 <div class="divider"></div>
                 
                 <div class="control-group">
-                    <span class="control-label">Min PCF</span>
-                    <input type="number" id="pcfMin" class="form-control" min="0" max="1.5" step="0.01" value="0.00">
+                    <div class="slider-row">
+                        <span class="control-label">Min</span>
+                        <input type="range" id="pcfMin" min="0" max="1.5" step="0.01" value="0.00">
+                        <span class="pcf-display" id="pcfMinValue">0.00</span>
+                    </div>
                 </div>
                 <div class="control-group">
-                    <span class="control-label">Max PCF</span>
-                    <input type="number" id="pcfMax" class="form-control" min="0" max="1.5" step="0.01" value="1.50">
+                    <div class="slider-row">
+                        <span class="control-label">Max</span>
+                        <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
+                        <span class="pcf-display" id="pcfMaxValue">1.50</span>
+                    </div>
                 </div>
 
                 <div class="divider"></div>
@@ -155,13 +174,12 @@
                 <button class="btn btn-outline" id="colorToggleBtn">Gradient Map</button>
                 <button class="btn btn-outline" id="barChartBtn">3D Bar Chart</button>
                 <button class="btn btn-outline" id="heatMapBtn">Heatmap</button>
-                
-                <div class="divider"></div>
+            </div>
 
+            <div class="header-bottom">
                 <button class="btn btn-outline" id="tableViewBtn">Table View</button>
                 <button class="btn btn-outline" id="locationBtn">Get Location</button>
                 <button class="btn btn-primary" id="exportBtn">Export Data</button>
-
             </div>
         </div>
 
@@ -171,8 +189,19 @@
                 <div id="map"></div>
                 <div id="summaryPanel">
                     <div class="summary-title">Data Summary</div>
-                    <div class="summary-item">Total Poles Filtered <span class="summary-val" id="sumTotal">0</span></div>
+                    <div class="summary-item">Total Poles <span class="summary-val" id="sumTotal">0</span></div>
                     <div class="summary-item">Average PCF <span class="summary-val" id="sumAvg">0.00</span></div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">PCF Distribution</div>
+                        <div class="mini-chart" id="miniChart">
+                            </div>
+                        <div class="chart-axis">
+                            <span>0.0</span>
+                            <span>PCF</span>
+                            <span>>1.5</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -185,8 +214,8 @@
                                 <th>Wood Species</th>
                                 <th>Moisture (%)</th>
                                 <th>Preservative</th>
-                                <th>PCF Concentration</th>
-                                <th>GPS Coordinates</th>
+                                <th>PCF Conc.</th>
+                                <th>Coordinates</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -237,9 +266,10 @@
         let isTableMode = false;
 
         function initializeDashboard() {
+            // Restore Original OpenStreetMap Tile Layer
             map = L.map('map').setView([45.5, -62.0], 9);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; OpenStreetMap contributors &copy; CARTO', maxZoom: 19
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
             }).addTo(map);
 
             markersLayer = L.layerGroup().addTo(map);
@@ -271,11 +301,19 @@
         }
 
         function getMarkerColor(pcf) {
-            if (!isColorMode && !isBarMode) return "#0052cc"; // Default Enterprise Blue
+            if (!isColorMode && !isBarMode) return "#0052cc"; 
             if (pcf <= 0) return "#919eab"; 
             let ratio = Math.min(pcf, 0.5) / 0.5;
             let hue = 60 - (ratio * 60); 
             return `hsl(${hue}, 100%, 45%)`;
+        }
+
+        // Custom Sort Logic for Pole IDs (Natural Sort)
+        function parsePoleId(idStr) {
+            // Match pattern like "324" or "324 (3)"
+            let match = idStr.match(/(\d+)(?:\s*\(\s*(\d+)\s*\))?/);
+            if (!match) return [999999, 0];
+            return [parseInt(match[1], 10), match[2] ? parseInt(match[2], 10) : 0];
         }
 
         function loadData() {
@@ -341,18 +379,24 @@
             // Filters
             document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            // Number Inputs replacing Sliders
-            document.getElementById('pcfMin').addEventListener('change', function() {
-                let minVal = parseFloat(this.value) || 0;
-                let maxVal = parseFloat(document.getElementById('pcfMax').value) || 1.5;
-                if (minVal > maxVal) this.value = maxVal;
+            // Sliders 
+            document.getElementById('pcfMin').addEventListener('input', function() {
+                let minVal = parseFloat(this.value);
+                let maxVal = parseFloat(document.getElementById('pcfMax').value);
+                if (minVal > maxVal) document.getElementById('pcfMax').value = minVal;
+                
+                document.getElementById('pcfMinValue').textContent = parseFloat(document.getElementById('pcfMin').value).toFixed(2);
+                document.getElementById('pcfMaxValue').textContent = parseFloat(document.getElementById('pcfMax').value).toFixed(2);
                 renderApplication();
             });
             
-            document.getElementById('pcfMax').addEventListener('change', function() {
-                let maxVal = parseFloat(this.value) || 1.5;
-                let minVal = parseFloat(document.getElementById('pcfMin').value) || 0;
-                if (maxVal < minVal) this.value = minVal;
+            document.getElementById('pcfMax').addEventListener('input', function() {
+                let maxVal = parseFloat(this.value);
+                let minVal = parseFloat(document.getElementById('pcfMin').value);
+                if (maxVal < minVal) document.getElementById('pcfMin').value = maxVal;
+                
+                document.getElementById('pcfMinValue').textContent = parseFloat(document.getElementById('pcfMin').value).toFixed(2);
+                document.getElementById('pcfMaxValue').textContent = parseFloat(document.getElementById('pcfMax').value).toFixed(2);
                 renderApplication();
             });
 
@@ -369,7 +413,7 @@
                 isHeatMode = !isHeatMode; this.classList.toggle('active'); renderApplication();
             });
 
-            // View Switcher (Map vs Table)
+            // View Switcher
             document.getElementById('tableViewBtn').addEventListener('click', function() {
                 isTableMode = !isTableMode;
                 let mapView = document.getElementById('mapView');
@@ -385,7 +429,7 @@
                     this.textContent = 'Table View';
                     tableView.classList.remove('active');
                     mapView.classList.add('active');
-                    map.invalidateSize(); // Fix leaflet rendering issue when unhidden
+                    map.invalidateSize(); 
                 }
             });
 
@@ -400,10 +444,7 @@
             document.getElementById('locationBtn').addEventListener('click', function() {
                 if (!navigator.geolocation) { alert("Geolocation is not supported by your browser."); return; }
                 
-                if(isTableMode) {
-                    // Switch to map view to show location
-                    document.getElementById('tableViewBtn').click();
-                }
+                if(isTableMode) document.getElementById('tableViewBtn').click();
 
                 let originalText = this.innerHTML; this.innerHTML = "Locating...";
                 navigator.geolocation.getCurrentPosition(
@@ -431,11 +472,7 @@
 
             let target = filteredData.find(d => d.id.toUpperCase().includes(query));
             if (target) {
-                if (isTableMode) {
-                    // If in table mode, switch to map mode first
-                    document.getElementById('tableViewBtn').click();
-                }
-                
+                if (isTableMode) document.getElementById('tableViewBtn').click();
                 if(markerRegistry[target.id]) {
                     let m = markerRegistry[target.id];
                     map.flyTo(m.getLatLng(), 18, {duration: 1.0});
@@ -447,7 +484,6 @@
         }
 
         function renderApplication() {
-            // Process Filters
             filteredData = [];
             let selectedSpecies = document.getElementById('speciesFilter').value;
             let minVal = parseFloat(document.getElementById('pcfMin').value) || 0;
@@ -464,16 +500,52 @@
                 }
             });
 
-            // Render Map Data
             renderMap();
-            
-            // Render Table Data
             renderTable();
 
-            // Update Summary
+            // Update Text Summary
             let count = filteredData.length;
             document.getElementById('sumTotal').textContent = count;
             document.getElementById('sumAvg').textContent = count > 0 ? (totalPcf / count).toFixed(3) : "0.00";
+            
+            // Update Mini Histogram
+            renderMiniChart();
+        }
+
+        function renderMiniChart() {
+            // Create 15 bins for PCF ranging from 0.0 to 1.5+
+            let binCount = 15;
+            let bins = new Array(binCount).fill(0);
+            let maxPcfScale = 1.5;
+            
+            filteredData.forEach(d => {
+                let binIdx = Math.floor((d.pcf / maxPcfScale) * binCount);
+                if (binIdx >= binCount) binIdx = binCount - 1; // Cap extreme values to the last bin
+                if (binIdx < 0) binIdx = 0;
+                bins[binIdx]++;
+            });
+
+            let maxFreq = Math.max(...bins, 1); // Avoid division by zero
+            let chartContainer = document.getElementById('miniChart');
+            chartContainer.innerHTML = '';
+
+            bins.forEach((count, idx) => {
+                let heightPct = (count / maxFreq) * 100;
+                let binStart = ((idx / binCount) * maxPcfScale).toFixed(1);
+                
+                let bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = heightPct + '%';
+                // Tooltip for each bar
+                bar.title = `PCF ~${binStart}: ${count} poles`;
+                
+                // Colorize critical bins (PCF > 0.5) if Color Mode is active
+                if (isColorMode && parseFloat(binStart) >= 0.5) {
+                    bar.style.backgroundColor = 'var(--danger)';
+                }
+
+                chartContainer.appendChild(bar);
+            });
         }
 
         function renderMap() {
@@ -541,16 +613,19 @@
             let tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             
-            // Sort by Structure ID by default, or could be PCF
-            let sortedData = [...filteredData].sort((a, b) => b.pcf - a.pcf);
+            // Custom Natural Sort by Pole ID Ascending (e.g., "1 (1)" before "10 (1)")
+            let sortedData = [...filteredData].sort((a, b) => {
+                let aParsed = parsePoleId(a.id);
+                let bParsed = parsePoleId(b.id);
+                if (aParsed[0] !== bParsed[0]) return aParsed[0] - bParsed[0];
+                return aParsed[1] - bParsed[1];
+            });
 
             sortedData.forEach(data => {
                 let tr = document.createElement('tr');
-                
-                // Allow clicking row to view on map
                 tr.style.cursor = 'pointer';
                 tr.onclick = function() {
-                    document.getElementById('tableViewBtn').click(); // Switch to map
+                    document.getElementById('tableViewBtn').click(); 
                     if(markerRegistry[data.id]) {
                         map.flyTo([data.lat, data.lon], 17, {duration: 0.8});
                         setTimeout(() => markerRegistry[data.id].openPopup(), 800);
