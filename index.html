@@ -1,47 +1,92 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Line 7003 电线杆质检地图</title>
+    <title>Line 7003 Pole Inspection Dashboard</title>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    
+
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; display: flex; flex-direction: column; height: 100vh; }
-        #header { padding: 15px; background-color: #f8f9fa; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 20px; }
+        :root {
+            --dal-black: #222222;
+            --dal-gold: #FFD400;
+            --dal-light-grey: #f4f4f4;
+        }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--dal-light-grey); color: var(--dal-black); }
+        
+        /* Header Styling */
+        #header { padding: 15px 30px; background-color: var(--dal-black); color: white; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--dal-gold); box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .header-left img { height: 40px; }
+        .header-left h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
+        
+        /* Control Panel Styling */
+        .controls { display: flex; align-items: center; gap: 20px; font-size: 14px; }
+        .control-group { display: flex; align-items: center; gap: 10px; }
+        select { padding: 6px 10px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; }
+        input[type="range"] { cursor: pointer; accent-color: var(--dal-gold); }
+        
+        /* Buttons */
+        .btn-export { background-color: var(--dal-gold); color: var(--dal-black); border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn-export:hover { background-color: #e6bf00; transform: translateY(-1px); }
+        
+        /* Map Container */
         #map { flex: 1; width: 100%; }
-        select { padding: 8px; font-size: 14px; border-radius: 4px; }
-        .popup-content { font-size: 14px; line-height: 1.5; }
-        .highlight { color: #d9534f; font-weight: bold; }
+        
+        /* Popup Styling */
+        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 3px 14px rgba(0,0,0,0.4); }
+        .popup-content { font-size: 14px; line-height: 1.6; color: #333; min-width: 180px; }
+        .popup-header { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; color: var(--dal-black); }
+        .highlight { color: #d9534f; font-weight: bold; font-size: 15px;}
     </style>
 </head>
 <body>
 
     <div id="header">
-        <h2 style="margin:0;">⚡ Line 7003 质检地图</h2>
-        <div>
-            <label for="speciesFilter"><strong>筛选树种:</strong></label>
-            <select id="speciesFilter">
-                <option value="ALL">显示全部</option>
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Dalhousie_University_logo.svg/1200px-Dalhousie_University_logo.svg.png" alt="Dalhousie Logo" style="filter: brightness(0) invert(1);">
+            <h2>Line 7003 Inspection Data</h2>
+        </div>
+        
+        <div class="controls">
+            <div class="control-group">
+                <label for="speciesFilter"><strong>Species:</strong></label>
+                <select id="speciesFilter">
+                    <option value="ALL">All Species</option>
+                    <option value="Red Pine">Red Pine</option>
+                    <option value="West Red Cedar">West Red Cedar</option>
+                    <option value="South Yellow Pine">South Yellow Pine</option>
+                    <option value="D.Fir">D.Fir</option>
+                    <option value="Other">Other / Unknown</option>
                 </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="pcfFilter"><strong>Min PCF:</strong> <span id="pcfValue">0.00</span></label>
+                <input type="range" id="pcfFilter" min="0" max="1.5" step="0.01" value="0">
+            </div>
+
+            <button class="btn-export" id="exportBtn">Export CSV</button>
         </div>
     </div>
 
     <div id="map"></div>
 
     <script>
-        // 1. 初始化地图
-        const map = L.map('map').setView([45.5, -62.0], 9); // 默认中心点大致在加拿大新斯科舍省
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
+        // Initialize Map
+        const map = L.map('map').setView([45.5, -62.0], 9);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
         }).addTo(map);
 
         let allData = [];
-        let markersLayer = L.layerGroup().addTo(map); // 创建一个图层专门放标记，方便清空
+        let filteredDataForExport = [];
+        let markersLayer = L.layerGroup().addTo(map);
 
-        // 2. 清洗坐标的辅助函数 (处理如 "-63.30878" 和 "61.45893 W" 混用的情况)
+        // Utility: Clean Coordinates
         function cleanCoord(coordStr) {
             if (!coordStr) return null;
             let str = String(coordStr).toUpperCase().trim();
@@ -55,84 +100,186 @@
             return null;
         }
 
-        // 3. 加载并解析 CSV 文件
-        Papa.parse("Line 7003 Final Data.csv", {
+        // Utility: Standardize Wood Species
+        function standardizeSpecies(rawSpecies) {
+            if (!rawSpecies) return 'Other';
+            let s = rawSpecies.trim().toUpperCase();
+            if (['RD', 'RP', 'D'].includes(s)) return 'Red Pine';
+            if (['WRC', 'WRC?', 'CEDER', 'CEDAR'].includes(s)) return 'West Red Cedar';
+            if (['YP', 'SYP'].includes(s)) return 'South Yellow Pine';
+            if (s === 'DF') return 'D.Fir';
+            return 'Other';
+        }
+
+        // Load and Process CSV Data
+        Papa.parse("Line_7003_Updated_Data.csv", {
             download: true,
             header: true,
             skipEmptyLines: true,
             complete: function(results) {
-                let data = results.data;
-                let speciesSet = new Set();
+                let rawData = results.data;
+                let ref324_2_Lat = null;
+                let ref324_2_Lon = null;
 
-                data.forEach(row => {
-                    let lat = cleanCoord(row['GPS Lat']);
-                    let lon = cleanCoord(row['GPS Long']);
-                    let species = row['Wood Species2'] ? row['Wood Species2'].trim() : 'Unknown';
-
-                    if (lat && lon) {
-                        row.cleanLat = lat;
-                        row.cleanLon = lon;
-                        row.cleanSpecies = species;
-                        allData.push(row);
-                        if (species !== 'Unknown' && species !== '') {
-                            speciesSet.add(species);
-                        }
+                // First pass: Find 324 (2) coordinates to fix 324 (3)
+                rawData.forEach(row => {
+                    if (row['Structure Number1'] === '324 (2)') {
+                        ref324_2_Lat = row['GPS Lat'];
+                        ref324_2_Lon = row['GPS Long'];
                     }
                 });
 
-                // 填充下拉菜单
-                const filterSelect = document.getElementById('speciesFilter');
-                speciesSet.forEach(species => {
-                    let option = document.createElement('option');
-                    option.value = species;
-                    option.textContent = species;
-                    filterSelect.appendChild(option);
+                // Second pass: Clean and structure data
+                let coordOccurrences = {}; // Used to separate overlapping points slightly
+
+                rawData.forEach(row => {
+                    // Apply hardcoded fix for 324 (3)
+                    if (row['Structure Number1'] === '324 (3)' && ref324_2_Lat) {
+                        row['GPS Lat'] = ref324_2_Lat;
+                        row['GPS Long'] = ref324_2_Lon;
+                    }
+
+                    let lat = cleanCoord(row['GPS Lat']);
+                    let lon = cleanCoord(row['GPS Long']);
+                    let species = standardizeSpecies(row['Wood Species2']);
+                    let pcfRaw = parseFloat(row['Sawdust Progrqm PCF']);
+                    let pcfValue = isNaN(pcfRaw) ? 0 : pcfRaw;
+
+                    if (lat && lon) {
+                        // Handle overlapping coordinates (Jitter algorithm)
+                        // Slightly shift points that share the exact same coordinate so they are visible
+                        let coordKey = `${lat.toFixed(5)},${lon.toFixed(5)}`;
+                        if (coordOccurrences[coordKey] !== undefined) {
+                            coordOccurrences[coordKey]++;
+                            let offsetMultiplier = coordOccurrences[coordKey];
+                            lat += 0.00008 * offsetMultiplier; // roughly 8 meters separation
+                            lon += 0.00008 * offsetMultiplier;
+                        } else {
+                            coordOccurrences[coordKey] = 0;
+                        }
+
+                        // Store processed row
+                        row.cleanLat = lat;
+                        row.cleanLon = lon;
+                        row.stdSpecies = species;
+                        row.pcfValue = pcfValue;
+                        allData.push(row);
+                    }
                 });
 
-                // 初始渲染所有点
-                renderMarkers("ALL");
-
-                // 绑定下拉菜单筛选事件
-                filterSelect.addEventListener('change', function(e) {
-                    renderMarkers(e.target.value);
-                });
+                renderMap();
             },
             error: function(err) {
-                alert("读取 CSV 文件失败，请确保文件名与代码中一致，并且放置在同一目录下！");
+                console.error("Error loading CSV:", err);
+                alert("Failed to load CSV data. Please ensure the file is named 'Line_7003_Updated_Data.csv'.");
             }
         });
 
-        // 4. 在地图上渲染标记点的函数
-        function renderMarkers(selectedSpecies) {
-            markersLayer.clearLayers(); // 清空旧标记
+        // Event Listeners for Controls
+        const speciesFilter = document.getElementById('speciesFilter');
+        const pcfFilter = document.getElementById('pcfFilter');
+        const pcfValueDisplay = document.getElementById('pcfValue');
+        const exportBtn = document.getElementById('exportBtn');
+
+        speciesFilter.addEventListener('change', renderMap);
+        
+        pcfFilter.addEventListener('input', function(e) {
+            pcfValueDisplay.textContent = parseFloat(e.target.value).toFixed(2);
+            renderMap();
+        });
+
+        exportBtn.addEventListener('click', exportToCSV);
+
+        // Core Render Function
+        function renderMap() {
+            markersLayer.clearLayers();
+            filteredDataForExport = [];
+            
+            let selectedSpecies = speciesFilter.value;
+            let minPcf = parseFloat(pcfFilter.value);
             let bounds = [];
 
             allData.forEach(row => {
-                if (selectedSpecies === "ALL" || row.cleanSpecies === selectedSpecies) {
-                    let pcfValue = row['Sawdust Progrqm PCF'] || 'N/A';
+                let matchSpecies = (selectedSpecies === "ALL" || row.stdSpecies === selectedSpecies);
+                let matchPcf = (row.pcfValue >= minPcf);
+
+                if (matchSpecies && matchPcf) {
+                    filteredDataForExport.push(row);
                     let structureNum = row['Structure Number1'] || 'N/A';
+                    let displayPcf = row['Sawdust Progrqm PCF'] || '0';
                     
                     let popupHTML = `
                         <div class="popup-content">
-                            <b>结构编号:</b> ${structureNum}<br>
-                            <b>树种:</b> ${row.cleanSpecies}<br>
-                            <b>防腐剂 (PCF):</b> <span class="highlight">${pcfValue}</span>
+                            <div class="popup-header">Structure: ${structureNum}</div>
+                            <b>Species:</b> ${row.stdSpecies}<br>
+                            <b>Preservative:</b> ${row['Preservative3'] || 'N/A'}<br>
+                            <b>Moisture:</b> ${row['Moisture %'] || 'N/A'}%<br>
+                            <b>PCF Conc:</b> <span class="highlight">${displayPcf}</span>
                         </div>
                     `;
 
-                    let marker = L.marker([row.cleanLat, row.cleanLon])
-                        .bindPopup(popupHTML)
-                        .bindTooltip(`杆号: ${structureNum}`); // 鼠标悬浮提示
+                    // Create Circle Marker with aesthetic styling
+                    let marker = L.circleMarker([row.cleanLat, row.cleanLon], {
+                        radius: 6,
+                        fillColor: "#ff4757",
+                        color: "#ffffff",
+                        weight: 1.5,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    });
+
+                    // Add hover/snap effects
+                    marker.on('mouseover', function (e) {
+                        this.openTooltip();
+                        this.setStyle({ radius: 10, fillColor: "#2ed573", weight: 2 });
+                    });
+                    
+                    marker.on('mouseout', function (e) {
+                        this.closeTooltip();
+                        this.setStyle({ radius: 6, fillColor: "#ff4757", weight: 1.5 });
+                    });
+
+                    marker.bindPopup(popupHTML);
+                    marker.bindTooltip(`Pole: ${structureNum}`, { direction: 'top', offset: [0, -10] });
                     
                     markersLayer.addLayer(marker);
                     bounds.push([row.cleanLat, row.cleanLon]);
                 }
             });
 
-            // 自动调整地图视野以包含所有可见的标记点
             if (bounds.length > 0) {
-                map.fitBounds(bounds, { padding: [50, 50] });
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
             }
+        }
+
+        // Export Functionality
+        function exportToCSV() {
+            if (filteredDataForExport.length === 0) {
+                alert("No data available to export.");
+                return;
+            }
+            
+            // Clean up internal properties before exporting
+            const cleanData = filteredDataForExport.map(row => {
+                const newRow = Object.assign({}, row);
+                delete newRow.cleanLat;
+                delete newRow.cleanLon;
+                delete newRow.stdSpecies;
+                delete newRow.pcfValue;
+                return newRow;
+            });
+
+            const csvString = Papa.unparse(cleanData);
+            const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", "Filtered_Line_7003_Data.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
