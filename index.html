@@ -24,50 +24,55 @@
             --success: #2ecc71; 
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
-            --radius: 3px; /* Scaled down */
+            --radius: 4px;
         }
 
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; font-size: 11px; }
+        /* Scaled down ~10% (Base font 13px instead of 14px/11px) */
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; font-size: 13px; }
         
         /* --- Login Overlay --- */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-main); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: var(--bg-panel); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow-md); text-align: center; width: 260px; border: 1px solid var(--border-color); }
-        .login-box h3 { margin-top: 0; margin-bottom: 18px; font-size: 16px; font-weight: 600; color: var(--text-main); }
-        .login-box input { width: 100%; padding: 8px 10px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 11px; box-sizing: border-box; outline: none; transition: all 0.2s; }
-        .login-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1); }
-        .error-msg { color: var(--danger); font-size: 10px; margin-bottom: 12px; display: none; text-align: left; background: #ffe9e5; padding: 6px; border-radius: 3px; border: 1px solid #f9c2b7;}
-        .login-box .btn-primary { width: 100%; justify-content: center; padding: 8px; font-size: 12px; }
+        .login-box { background: var(--bg-panel); padding: 36px; border-radius: var(--radius); box-shadow: var(--shadow-md); text-align: center; width: 300px; border: 1px solid var(--border-color); }
+        .login-box h3 { margin-top: 0; margin-bottom: 20px; font-size: 18px; font-weight: 600; color: var(--text-main); }
+        .login-box input { width: 100%; padding: 10px 12px; margin-bottom: 14px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 13px; box-sizing: border-box; outline: none; transition: all 0.2s; }
+        .login-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1); }
+        .error-msg { color: var(--danger); font-size: 12px; margin-bottom: 14px; display: none; text-align: left; background: #ffe9e5; padding: 8px; border-radius: 4px; border: 1px solid #f9c2b7;}
+        .login-box .btn-primary { width: 100%; justify-content: center; padding: 10px; font-size: 14px; }
 
         /* --- Main Layout --- */
         #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
         
-        /* --- Three-Row Header (Scaled Down 25%) --- */
+        /* --- Three-Row Header --- */
         #header { background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-sm); z-index: 1000; display: flex; flex-direction: column; }
         
-        .header-top { padding: 8px 18px; border-bottom: 1px solid var(--border-color); }
-        .header-title { margin: 0; font-size: 14px; font-weight: 600; color: var(--text-main); letter-spacing: 0.3px; }
+        .header-top { padding: 10px 20px; border-bottom: 1px solid var(--border-color); }
+        .header-title { margin: 0; font-size: 16px; font-weight: 600; color: var(--text-main); letter-spacing: 0.3px; }
         
-        .header-middle { padding: 8px 18px; display: flex; flex-wrap: nowrap; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); overflow-x: auto; white-space: nowrap; }
+        .header-middle { padding: 8px 20px; display: flex; flex-wrap: nowrap; align-items: center; gap: 14px; border-bottom: 1px solid var(--border-color); overflow-x: auto; white-space: nowrap; }
         
-        .header-bottom { padding: 6px 18px; display: flex; align-items: center; gap: 10px; background-color: #f9fafb; }
+        .header-bottom { padding: 6px 20px; display: flex; align-items: center; gap: 10px; background-color: #f9fafb; }
         
         /* --- Controls & Inputs --- */
         .control-group { display: flex; align-items: center; gap: 6px; }
-        .control-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-        .form-control { padding: 3px 6px; font-size: 11px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--bg-panel); outline: none; transition: all 0.2s; }
+        .control-label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+        .form-control { padding: 4px 8px; font-size: 12px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--bg-panel); outline: none; transition: all 0.2s; }
         .form-control:focus { border-color: var(--primary); }
-        input[type="text"].form-control { width: 110px; }
+        input[type="text"].form-control { width: 130px; }
         
-        /* Sliders */
-        .slider-row { display: flex; align-items: center; gap: 4px; }
-        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 70px; }
-        .pcf-display { display: inline-block; width: 28px; font-weight: 600; color: var(--primary); text-align: right; font-size: 11px; }
+        /* Sliders & Direct Inputs */
+        .slider-row { display: flex; align-items: center; gap: 6px; }
+        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 80px; }
         
-        .divider { width: 1px; height: 16px; background-color: var(--border-color); margin: 0 2px; }
+        /* New Direct Number Input Styling */
+        .pcf-input { width: 44px; padding: 2px 4px; border: 1px solid var(--border-color); border-radius: 3px; font-size: 12px; font-weight: 600; color: var(--primary); text-align: center; outline: none; transition: border-color 0.2s; background: var(--bg-main); }
+        .pcf-input:focus { border-color: var(--primary); background: #fff; }
+        .pcf-input::-webkit-inner-spin-button, .pcf-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        
+        .divider { width: 1px; height: 18px; background-color: var(--border-color); margin: 0 4px; }
 
         /* --- Buttons --- */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; border-radius: var(--radius); font-weight: 500; font-size: 11px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; gap: 4px; }
-        .btn-icon-only { padding: 4px 10px; font-size: 12px; } 
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 5px 12px; border-radius: var(--radius); font-weight: 500; font-size: 12px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; gap: 5px; }
+        .btn-icon-only { padding: 5px 10px; font-size: 13px; } 
         
         .btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
         .btn-primary:hover { background-color: var(--primary-hover); }
@@ -85,43 +90,43 @@
 
         /* --- Summary Overlay on Map --- */
         #summaryPanel {
-            position: absolute; bottom: 18px; left: 18px; background: rgba(255, 255, 255, 0.95);
-            padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md); z-index: 999; width: 180px;
+            position: absolute; bottom: 20px; left: 20px; background: rgba(255, 255, 255, 0.95);
+            padding: 14px; border-radius: var(--radius); border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md); z-index: 999; width: 200px;
             backdrop-filter: blur(4px); transition: width 0.3s ease;
         }
         
-        .summary-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; margin-bottom: 8px; transition: all 0.3s; }
+        .summary-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px; transition: all 0.3s; }
         .summary-header.collapsed { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .summary-title { font-weight: 600; font-size: 11px; color: var(--text-main); margin: 0; } /* Removed all caps */
-        .toggle-icon { font-size: 10px; color: var(--text-muted); transition: transform 0.3s; }
+        .summary-title { font-weight: 600; font-size: 13px; color: var(--text-main); margin: 0; } 
+        .toggle-icon { font-size: 11px; color: var(--text-muted); transition: transform 0.3s; }
         .toggle-icon.collapsed { transform: rotate(180deg); }
         
         #summaryContent { overflow: hidden; transition: max-height 0.3s ease; }
         #summaryContent.collapsed { display: none; }
 
-        .summary-item { margin-bottom: 6px; font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
-        .summary-val { font-weight: 600; font-size: 12px; color: var(--text-main); }
+        .summary-item { margin-bottom: 6px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        .summary-val { font-weight: 600; font-size: 13px; color: var(--text-main); }
         
-        .chart-container { margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 8px; }
-        .chart-title { font-size: 9px; color: var(--text-muted); margin-bottom: 4px; text-align: center; }
-        .mini-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 30px; gap: 1px; }
+        .chart-container { margin-top: 12px; border-top: 1px dashed var(--border-color); padding-top: 8px; }
+        .chart-title { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; text-align: center; }
+        .mini-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 36px; gap: 1px; }
         .chart-bar { flex: 1; background-color: var(--primary); border-radius: 2px 2px 0 0; min-height: 1px; transition: height 0.1s ease; opacity: 0.8; }
         .chart-axis { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); margin-top: 2px; }
 
         /* --- Table View --- */
         #tableContainer { width: 100%; height: 100%; overflow: auto; background: var(--bg-panel); padding: 0; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 11px; }
-        th { background-color: #f9fafb; padding: 8px 16px; font-weight: 600; color: var(--text-muted); position: sticky; top: 0; border-bottom: 1px solid var(--border-color); z-index: 10; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
-        td { padding: 8px 16px; border-bottom: 1px solid var(--bg-main); color: var(--text-main); transition: background-color 0.1s; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 12px; }
+        th { background-color: #f9fafb; padding: 10px 20px; font-weight: 600; color: var(--text-muted); position: sticky; top: 0; border-bottom: 1px solid var(--border-color); z-index: 10; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+        td { padding: 10px 20px; border-bottom: 1px solid var(--bg-main); color: var(--text-main); transition: background-color 0.1s; }
         tbody tr:hover td { background-color: #f4f6f8; }
         .val-danger { color: var(--danger); font-weight: 600; }
 
         /* --- Map Popups --- */
-        .leaflet-popup-content-wrapper { border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); padding: 2px; }
-        .popup-content { font-size: 11px; line-height: 1.5; color: var(--text-main); min-width: 160px; }
-        .popup-header { border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 6px; font-weight: 600; font-size: 12px; color: var(--primary); }
-        .leaflet-tooltip { border-radius: 2px; border: 1px solid #ccc; font-weight: 600; font-size: 10px; padding: 2px 4px;}
+        .leaflet-popup-content-wrapper { border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); padding: 3px; }
+        .popup-content { font-size: 12px; line-height: 1.5; color: var(--text-main); min-width: 180px; }
+        .popup-header { border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 6px; font-weight: 600; font-size: 13px; color: var(--primary); }
+        .leaflet-tooltip { border-radius: 2px; border: 1px solid #ccc; font-weight: 600; font-size: 11px; padding: 2px 5px;}
     </style>
 </head>
 <body>
@@ -164,22 +169,18 @@
                 
                 <div class="divider"></div>
                 
-                <datalist id="snap-points">
-                    <option value="0.12"></option>
-                </datalist>
-
                 <div class="control-group">
                     <div class="slider-row">
                         <span class="control-label">Min</span>
-                        <input type="range" id="pcfMin" min="0" max="1.5" step="0.01" value="0.00" list="snap-points">
-                        <span class="pcf-display" id="pcfMinValue">0.00</span>
+                        <input type="range" id="pcfMin" min="0" max="1.5" step="0.01" value="0.00">
+                        <input type="number" id="pcfMinInput" class="pcf-input" min="0" max="1.5" step="0.01" value="0.00">
                     </div>
                 </div>
                 <div class="control-group">
                     <div class="slider-row">
                         <span class="control-label">Max</span>
-                        <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50" list="snap-points">
-                        <span class="pcf-display" id="pcfMaxValue">1.50+</span>
+                        <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
+                        <input type="number" id="pcfMaxInput" class="pcf-input" min="0" max="1.5" step="0.01" value="1.50">
                     </div>
                 </div>
 
@@ -204,7 +205,8 @@
                 <div id="map"></div>
                 <div id="summaryPanel">
                     <div class="summary-header" id="summaryHeader" title="Click to collapse/expand">
-                        <h4 class="summary-title">Data Summary</h4> <i class="fa-solid fa-chevron-down toggle-icon" id="summaryToggleIcon"></i>
+                        <h4 class="summary-title">Data Summary</h4> 
+                        <i class="fa-solid fa-chevron-down toggle-icon" id="summaryToggleIcon"></i>
                     </div>
 
                     <div id="summaryContent">
@@ -397,45 +399,44 @@
         function setupEventListeners() {
             const pcfMinSlider = document.getElementById('pcfMin');
             const pcfMaxSlider = document.getElementById('pcfMax');
-            const pcfMinValDisplay = document.getElementById('pcfMinValue');
-            const pcfMaxValDisplay = document.getElementById('pcfMaxValue');
+            const pcfMinInput = document.getElementById('pcfMinInput');
+            const pcfMaxInput = document.getElementById('pcfMaxInput');
 
             document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            // ========== 核心卡顿与捕捉(Snap)修复：恢复实时渲染，并加入 JS 吸附手感 ==========
-            pcfMinSlider.addEventListener('input', function() {
-                let val = parseFloat(this.value);
-                // Magnetic Snap to 0.12
-                if (Math.abs(val - 0.12) <= 0.015) { this.value = 0.12; val = 0.12; }
+            // Sync Engine between Sliders and Number Inputs
+            function syncValues(source) {
+                let minVal, maxVal;
                 
-                let maxVal = parseFloat(pcfMaxSlider.value);
-                if (isNaN(maxVal)) maxVal = 1.5;
+                if (source === 'slider') {
+                    minVal = parseFloat(pcfMinSlider.value);
+                    maxVal = parseFloat(pcfMaxSlider.value);
+                    if(minVal > maxVal) { maxVal = minVal; pcfMaxSlider.value = maxVal; }
+                    pcfMinInput.value = minVal.toFixed(2);
+                    pcfMaxInput.value = maxVal.toFixed(2);
+                } else if (source === 'input') {
+                    minVal = parseFloat(pcfMinInput.value) || 0;
+                    maxVal = parseFloat(pcfMaxInput.value) || 0;
+                    if(minVal < 0) minVal = 0;
+                    if(maxVal > 1.5) maxVal = 1.5;
+                    if(minVal > maxVal) { maxVal = minVal; pcfMaxInput.value = maxVal.toFixed(2); }
+                    pcfMinSlider.value = minVal;
+                    pcfMaxSlider.value = maxVal;
+                }
                 
-                if (val > maxVal) pcfMaxSlider.value = this.value;
-                
-                pcfMinValDisplay.textContent = parseFloat(this.value).toFixed(2);
-                let maxDisplay = parseFloat(pcfMaxSlider.value).toFixed(2);
-                pcfMaxValDisplay.textContent = (maxDisplay === "1.50") ? "1.50+" : maxDisplay;
-                
-                renderApplication(); // 恢复实时丝滑渲染
-            });
-            
-            pcfMaxSlider.addEventListener('input', function() {
-                let val = parseFloat(this.value);
-                // Magnetic Snap to 0.12
-                if (Math.abs(val - 0.12) <= 0.015) { this.value = 0.12; val = 0.12; }
-                
-                let minVal = parseFloat(pcfMinSlider.value);
-                if (isNaN(minVal)) minVal = 0;
+                renderApplication();
+            }
 
-                if (val < minVal) pcfMinSlider.value = this.value;
-                
-                pcfMinValDisplay.textContent = parseFloat(pcfMinSlider.value).toFixed(2);
-                let maxDisplay = parseFloat(this.value).toFixed(2);
-                pcfMaxValDisplay.textContent = (maxDisplay === "1.50") ? "1.50+" : maxDisplay;
-                
-                renderApplication(); // 恢复实时丝滑渲染
-            });
+            // Real-time rendering enabled for both sliders and text inputs
+            pcfMinSlider.addEventListener('input', () => syncValues('slider'));
+            pcfMaxSlider.addEventListener('input', () => syncValues('slider'));
+            
+            pcfMinInput.addEventListener('change', () => syncValues('input'));
+            pcfMaxInput.addEventListener('change', () => syncValues('input'));
+            // Trigger application render on keyup for instant keyboard typing feedback
+            pcfMinInput.addEventListener('keyup', () => syncValues('input'));
+            pcfMaxInput.addEventListener('keyup', () => syncValues('input'));
+
 
             // Summary Panel Collapse Toggle
             document.getElementById('summaryHeader').addEventListener('click', function() {
@@ -452,8 +453,8 @@
                 document.getElementById('speciesFilter').value = 'ALL';
                 pcfMinSlider.value = '0.00';
                 pcfMaxSlider.value = '1.50';
-                pcfMinValDisplay.textContent = '0.00';
-                pcfMaxValDisplay.textContent = '1.50+';
+                pcfMinInput.value = '0.00';
+                pcfMaxInput.value = '1.50';
                 document.getElementById('searchInput').value = '';
 
                 isColorMode = false;
@@ -554,11 +555,8 @@
             filteredData = [];
             let selectedSpecies = document.getElementById('speciesFilter').value;
             
-            // ========== 核心Bug修复：防呆处理空字符串与假值问题 ==========
-            let minStr = document.getElementById('pcfMin').value;
-            let maxStr = document.getElementById('pcfMax').value;
-            let minVal = minStr === "" || isNaN(parseFloat(minStr)) ? 0 : parseFloat(minStr);
-            let maxVal = maxStr === "" || isNaN(parseFloat(maxStr)) ? 1.5 : parseFloat(maxStr);
+            let minVal = parseFloat(document.getElementById('pcfMinSlider').value) || parseFloat(document.getElementById('pcfMinInput').value) || 0;
+            let maxVal = parseFloat(document.getElementById('pcfMaxSlider').value) || parseFloat(document.getElementById('pcfMaxInput').value) || 1.5;
             
             let isAtMax = (maxVal >= 1.5);
             let totalPcf = 0;
