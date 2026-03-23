@@ -11,6 +11,7 @@
 
     <style>
         :root {
+            /* Dalhousie University Brand Colors */
             --dal-black: #222222;
             --dal-gold: #FFD400;
             --dal-light-grey: #f4f4f4;
@@ -20,26 +21,28 @@
         /* Header Styling */
         #header { padding: 15px 30px; background-color: var(--dal-black); color: white; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--dal-gold); box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
         .header-left { display: flex; align-items: center; gap: 20px; }
-        .header-left img { height: 40px; }
-        .header-left h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: 0.5px; }
+        .header-left img { height: 45px; }
+        .header-left h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
         
         /* Control Panel Styling */
-        .controls { display: flex; align-items: center; gap: 20px; font-size: 14px; }
+        .controls { display: flex; align-items: center; gap: 25px; font-size: 14px; }
         .control-group { display: flex; align-items: center; gap: 10px; }
-        select { padding: 6px 10px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; }
-        input[type="range"] { cursor: pointer; accent-color: var(--dal-gold); }
+        select { padding: 6px 10px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; }
+        input[type="range"] { cursor: pointer; accent-color: var(--dal-gold); width: 120px; }
+        .pcf-display { display: inline-block; width: 40px; font-weight: bold; color: var(--dal-gold); }
         
         /* Buttons */
-        .btn-export { background-color: var(--dal-gold); color: var(--dal-black); border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
-        .btn-export:hover { background-color: #e6bf00; transform: translateY(-1px); }
+        .btn-export { background-color: var(--dal-gold); color: var(--dal-black); border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
+        .btn-export:hover { background-color: #e6bf00; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .btn-export:active { transform: translateY(0); }
         
         /* Map Container */
         #map { flex: 1; width: 100%; }
         
         /* Popup Styling */
-        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 3px 14px rgba(0,0,0,0.4); }
+        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .popup-content { font-size: 14px; line-height: 1.6; color: #333; min-width: 180px; }
-        .popup-header { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px; font-weight: bold; color: var(--dal-black); }
+        .popup-header { border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 6px; font-weight: bold; color: var(--dal-black); font-size: 15px; }
         .highlight { color: #d9534f; font-weight: bold; font-size: 15px;}
     </style>
 </head>
@@ -65,28 +68,29 @@
             </div>
             
             <div class="control-group">
-                <label for="pcfFilter"><strong>Min PCF:</strong> <span id="pcfValue">0.00</span></label>
-                <input type="range" id="pcfFilter" min="0" max="1.5" step="0.01" value="0">
+                <label for="pcfFilter"><strong>Min PCF:</strong> <span class="pcf-display" id="pcfValue">0.00</span></label>
+                <input type="range" id="pcfFilter" min="0" max="1.0" step="0.01" value="0">
             </div>
 
-            <button class="btn-export" id="exportBtn">Export CSV</button>
+            <button class="btn-export" id="exportBtn">Export to CSV</button>
         </div>
     </div>
 
     <div id="map"></div>
 
     <script>
-        // Initialize Map
+        // Initialize Map with a clean, light base map
         const map = L.map('map').setView([45.5, -62.0], 9);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            maxZoom: 19
         }).addTo(map);
 
         let allData = [];
         let filteredDataForExport = [];
         let markersLayer = L.layerGroup().addTo(map);
 
-        // Utility: Clean Coordinates
+        // Utility: Clean Coordinates (Handles "61.45893 W" and "-63.30878" formats)
         function cleanCoord(coordStr) {
             if (!coordStr) return null;
             let str = String(coordStr).toUpperCase().trim();
@@ -100,19 +104,19 @@
             return null;
         }
 
-        // Utility: Standardize Wood Species
+        // Utility: Standardize Wood Species based on requirements
         function standardizeSpecies(rawSpecies) {
             if (!rawSpecies) return 'Other';
             let s = rawSpecies.trim().toUpperCase();
-            if (['RD', 'RP', 'D'].includes(s)) return 'Red Pine';
+            if (['RD', 'RP', 'D', 'RED PINE'].includes(s)) return 'Red Pine';
             if (['WRC', 'WRC?', 'CEDER', 'CEDAR'].includes(s)) return 'West Red Cedar';
-            if (['YP', 'SYP'].includes(s)) return 'South Yellow Pine';
-            if (s === 'DF') return 'D.Fir';
+            if (['YP', 'SYP', 'SOUTH YELLOW PINE'].includes(s)) return 'South Yellow Pine';
+            if (['DF', 'D.FIR'].includes(s)) return 'D.Fir';
             return 'Other';
         }
 
         // Load and Process CSV Data
-        Papa.parse("Line_7003_Updated_Data.csv", {
+        Papa.parse("Line 7003 Final Data.csv", {
             download: true,
             header: true,
             skipEmptyLines: true,
@@ -123,18 +127,21 @@
 
                 // First pass: Find 324 (2) coordinates to fix 324 (3)
                 rawData.forEach(row => {
-                    if (row['Structure Number1'] === '324 (2)') {
+                    let structNum = String(row['Structure Number1']).trim();
+                    if (structNum === '324 (2)') {
                         ref324_2_Lat = row['GPS Lat'];
                         ref324_2_Lon = row['GPS Long'];
                     }
                 });
 
-                // Second pass: Clean and structure data
-                let coordOccurrences = {}; // Used to separate overlapping points slightly
+                // Second pass: Clean, structure, and handle overlapping points
+                let coordOccurrences = {}; 
 
                 rawData.forEach(row => {
+                    let structNum = String(row['Structure Number1']).trim();
+                    
                     // Apply hardcoded fix for 324 (3)
-                    if (row['Structure Number1'] === '324 (3)' && ref324_2_Lat) {
+                    if (structNum === '324 (3)' && ref324_2_Lat) {
                         row['GPS Lat'] = ref324_2_Lat;
                         row['GPS Long'] = ref324_2_Lon;
                     }
@@ -142,18 +149,24 @@
                     let lat = cleanCoord(row['GPS Lat']);
                     let lon = cleanCoord(row['GPS Long']);
                     let species = standardizeSpecies(row['Wood Species2']);
-                    let pcfRaw = parseFloat(row['Sawdust Progrqm PCF']);
-                    let pcfValue = isNaN(pcfRaw) ? 0 : pcfRaw;
+                    
+                    // Handle PCF Parsing
+                    let pcfStr = row['Sawdust Progrqm PCF'];
+                    let pcfValue = 0;
+                    if (pcfStr) {
+                        let parsed = parseFloat(String(pcfStr).replace(/[^0-9.-]/g, ''));
+                        if (!isNaN(parsed)) pcfValue = parsed;
+                    }
 
-                    if (lat && lon) {
-                        // Handle overlapping coordinates (Jitter algorithm)
-                        // Slightly shift points that share the exact same coordinate so they are visible
+                    if (lat !== null && lon !== null) {
+                        // Offset overlapping coordinates slightly so they don't cover each other
                         let coordKey = `${lat.toFixed(5)},${lon.toFixed(5)}`;
                         if (coordOccurrences[coordKey] !== undefined) {
                             coordOccurrences[coordKey]++;
                             let offsetMultiplier = coordOccurrences[coordKey];
-                            lat += 0.00008 * offsetMultiplier; // roughly 8 meters separation
-                            lon += 0.00008 * offsetMultiplier;
+                            // Add roughly 5 meters of offset per overlapping point
+                            lat += 0.00005 * offsetMultiplier; 
+                            lon += 0.00005 * offsetMultiplier;
                         } else {
                             coordOccurrences[coordKey] = 0;
                         }
@@ -171,7 +184,7 @@
             },
             error: function(err) {
                 console.error("Error loading CSV:", err);
-                alert("Failed to load CSV data. Please ensure the file is named 'Line_7003_Updated_Data.csv'.");
+                alert("Failed to load CSV data. Please ensure the file is named exactly 'Line 7003 Final Data.csv'.");
             }
         });
 
@@ -184,7 +197,8 @@
         speciesFilter.addEventListener('change', renderMap);
         
         pcfFilter.addEventListener('input', function(e) {
-            pcfValueDisplay.textContent = parseFloat(e.target.value).toFixed(2);
+            let val = parseFloat(e.target.value).toFixed(2);
+            pcfValueDisplay.textContent = val;
             renderMap();
         });
 
@@ -207,13 +221,15 @@
                     filteredDataForExport.push(row);
                     let structureNum = row['Structure Number1'] || 'N/A';
                     let displayPcf = row['Sawdust Progrqm PCF'] || '0';
+                    let preservative = row['Preservative3'] || 'N/A';
+                    let moisture = row['Moisture %'] || 'N/A';
                     
                     let popupHTML = `
                         <div class="popup-content">
                             <div class="popup-header">Structure: ${structureNum}</div>
                             <b>Species:</b> ${row.stdSpecies}<br>
-                            <b>Preservative:</b> ${row['Preservative3'] || 'N/A'}<br>
-                            <b>Moisture:</b> ${row['Moisture %'] || 'N/A'}%<br>
+                            <b>Preservative:</b> ${preservative}<br>
+                            <b>Moisture:</b> ${moisture}%<br>
                             <b>PCF Conc:</b> <span class="highlight">${displayPcf}</span>
                         </div>
                     `;
@@ -221,32 +237,33 @@
                     // Create Circle Marker with aesthetic styling
                     let marker = L.circleMarker([row.cleanLat, row.cleanLon], {
                         radius: 6,
-                        fillColor: "#ff4757",
+                        fillColor: "#e74c3c", // Base red color
                         color: "#ffffff",
                         weight: 1.5,
                         opacity: 1,
-                        fillOpacity: 0.8
+                        fillOpacity: 0.85
                     });
 
-                    // Add hover/snap effects
+                    // Add hover/snap effects (changes color and size on hover)
                     marker.on('mouseover', function (e) {
                         this.openTooltip();
-                        this.setStyle({ radius: 10, fillColor: "#2ed573", weight: 2 });
+                        this.setStyle({ radius: 9, fillColor: "#2ecc71", weight: 2, fillOpacity: 1 });
                     });
                     
                     marker.on('mouseout', function (e) {
                         this.closeTooltip();
-                        this.setStyle({ radius: 6, fillColor: "#ff4757", weight: 1.5 });
+                        this.setStyle({ radius: 6, fillColor: "#e74c3c", weight: 1.5, fillOpacity: 0.85 });
                     });
 
                     marker.bindPopup(popupHTML);
-                    marker.bindTooltip(`Pole: ${structureNum}`, { direction: 'top', offset: [0, -10] });
+                    marker.bindTooltip(`Pole: ${structureNum}`, { direction: 'top', offset: [0, -8] });
                     
                     markersLayer.addLayer(marker);
                     bounds.push([row.cleanLat, row.cleanLon]);
                 }
             });
 
+            // Adjust map view to fit all currently visible points
             if (bounds.length > 0) {
                 map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
             }
@@ -255,11 +272,11 @@
         // Export Functionality
         function exportToCSV() {
             if (filteredDataForExport.length === 0) {
-                alert("No data available to export.");
+                alert("No data available to export based on current filters.");
                 return;
             }
             
-            // Clean up internal properties before exporting
+            // Remove internal JS properties before exporting
             const cleanData = filteredDataForExport.map(row => {
                 const newRow = Object.assign({}, row);
                 delete newRow.cleanLat;
@@ -269,13 +286,14 @@
                 return newRow;
             });
 
+            // Generate and download CSV
             const csvString = Papa.unparse(cleanData);
             const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             
             link.setAttribute("href", url);
-            link.setAttribute("download", "Filtered_Line_7003_Data.csv");
+            link.setAttribute("download", "Filtered_Line_7003_Export.csv");
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
