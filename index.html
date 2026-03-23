@@ -21,7 +21,7 @@
             --primary: #0052cc;
             --primary-hover: #0043a6;
             --danger: #de3618;
-            --success: #2ecc71; /* Emerald Green for Location */
+            --success: #2ecc71; 
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
             --radius: 4px;
@@ -86,14 +86,25 @@
         
         #map { width: 100%; height: 100%; background-color: #e3e9f0; }
 
-        /* --- Summary Overlay on Map with Mini-Chart --- */
+        /* --- Summary Overlay on Map --- */
         #summaryPanel {
             position: absolute; bottom: 24px; left: 24px; background: rgba(255, 255, 255, 0.95);
             padding: 16px; border-radius: var(--radius); border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md); z-index: 999; width: 220px; pointer-events: none;
-            backdrop-filter: blur(4px);
+            box-shadow: var(--shadow-md); z-index: 999; width: 220px;
+            backdrop-filter: blur(4px); transition: width 0.3s ease;
         }
-        .summary-title { font-weight: 600; font-size: 13px; margin-bottom: 10px; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; }
+        
+        /* Collapsible Header Styling */
+        .summary-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 12px; transition: all 0.3s; }
+        .summary-header.collapsed { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .summary-title { font-weight: 600; font-size: 14px; color: var(--text-main); letter-spacing: 0.3px; margin: 0; }
+        .toggle-icon { font-size: 12px; color: var(--text-muted); transition: transform 0.3s; }
+        .toggle-icon.collapsed { transform: rotate(180deg); }
+        
+        /* Content to be collapsed */
+        #summaryContent { overflow: hidden; transition: max-height 0.3s ease; }
+        #summaryContent.collapsed { display: none; }
+
         .summary-item { margin-bottom: 8px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
         .summary-val { font-weight: 600; font-size: 14px; color: var(--text-main); }
         
@@ -178,6 +189,8 @@
                 <button class="btn btn-outline" id="colorToggleBtn"><i class="fa-solid fa-palette"></i> Gradient</button>
                 <button class="btn btn-outline" id="barChartBtn"><i class="fa-solid fa-chart-column"></i> 3D Bar</button>
                 <button class="btn btn-outline" id="heatMapBtn"><i class="fa-solid fa-fire"></i> Heatmap</button>
+                
+                <button class="btn btn-outline btn-icon-only" id="resetBtn" title="Reset All Filters & Views" style="margin-left: 8px;"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
 
             <div class="header-bottom">
@@ -192,20 +205,27 @@
             <div id="mapView" class="view-panel active">
                 <div id="map"></div>
                 <div id="summaryPanel">
-                    <div class="summary-title">Data Summary</div>
-                    <div class="summary-item">Total Poles <span class="summary-val" id="sumTotal">0</span></div>
-                    <div class="summary-item">Average PCF <span class="summary-val" id="sumAvg">0.00</span></div>
                     
-                    <div class="chart-container">
-                        <div class="chart-title">PCF Distribution</div>
-                        <div class="mini-chart" id="miniChart">
+                    <div class="summary-header" id="summaryHeader" title="Click to collapse/expand">
+                        <h4 class="summary-title">Data Summary</h4>
+                        <i class="fa-solid fa-chevron-down toggle-icon" id="summaryToggleIcon"></i>
+                    </div>
+
+                    <div id="summaryContent">
+                        <div class="summary-item">Total Poles <span class="summary-val" id="sumTotal">0</span></div>
+                        <div class="summary-item">Average PCF <span class="summary-val" id="sumAvg">0.00</span></div>
+                        
+                        <div class="chart-container">
+                            <div class="chart-title">PCF Distribution</div>
+                            <div class="mini-chart" id="miniChart"></div>
+                            <div class="chart-axis">
+                                <span>0.0</span>
+                                <span>PCF</span>
+                                <span>>1.5</span>
                             </div>
-                        <div class="chart-axis">
-                            <span>0.0</span>
-                            <span>PCF</span>
-                            <span>>1.5</span>
                         </div>
                     </div>
+
                 </div>
             </div>
 
@@ -268,10 +288,9 @@
         let isBarMode = false;
         let isHeatMode = false;
         let isTableMode = false;
-        let isInitialLoad = true; // 新增：用于防止每次筛选时地图视角重置
+        let isInitialLoad = true; 
 
         function initializeDashboard() {
-            // Original OpenStreetMap Base
             map = L.map('map').setView([45.5, -62.0], 9);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
@@ -313,7 +332,6 @@
             return `hsl(${hue}, 100%, 45%)`;
         }
 
-        // Custom Sort Logic for Pole IDs (Natural Sort)
         function parsePoleId(idStr) {
             let match = idStr.match(/(\d+)(?:\s*\(\s*(\d+)\s*\))?/);
             if (!match) return [999999, 0];
@@ -386,10 +404,10 @@
         }
 
         function setupEventListeners() {
+            
             // Filters
             document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            // Sliders 
             document.getElementById('pcfMin').addEventListener('input', function() {
                 let minVal = parseFloat(this.value);
                 let maxVal = parseFloat(document.getElementById('pcfMax').value);
@@ -410,6 +428,40 @@
                 renderApplication();
             });
 
+            // Summary Panel Collapse Toggle
+            document.getElementById('summaryHeader').addEventListener('click', function() {
+                const content = document.getElementById('summaryContent');
+                const icon = document.getElementById('summaryToggleIcon');
+                
+                content.classList.toggle('collapsed');
+                icon.classList.toggle('collapsed');
+                this.classList.toggle('collapsed');
+            });
+
+            // Reset Button
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                // Reset Filters
+                document.getElementById('speciesFilter').value = 'ALL';
+                document.getElementById('pcfMin').value = '0.00';
+                document.getElementById('pcfMax').value = '1.50';
+                document.getElementById('pcfMinValue').textContent = '0.00';
+                document.getElementById('pcfMaxValue').textContent = '1.50';
+                document.getElementById('searchInput').value = '';
+
+                // Reset Map Modes
+                isColorMode = false;
+                isBarMode = false;
+                isHeatMode = false;
+                document.getElementById('colorToggleBtn').classList.remove('active');
+                document.getElementById('barChartBtn').classList.remove('active');
+                document.getElementById('heatMapBtn').classList.remove('active');
+
+                // Force map to re-center on reset
+                isInitialLoad = true;
+                
+                renderApplication();
+            });
+
             // Map Mode Toggles
             document.getElementById('colorToggleBtn').addEventListener('click', function() {
                 isColorMode = !isColorMode; this.classList.toggle('active'); renderApplication();
@@ -423,7 +475,7 @@
                 isHeatMode = !isHeatMode; this.classList.toggle('active'); renderApplication();
             });
 
-            // View Switcher (Icon Toggle)
+            // View Switcher 
             document.getElementById('tableViewBtn').addEventListener('click', function() {
                 isTableMode = !isTableMode;
                 let mapView = document.getElementById('mapView');
@@ -431,13 +483,13 @@
                 
                 if (isTableMode) {
                     this.classList.add('active');
-                    this.innerHTML = '<i class="fa-solid fa-map"></i>'; // Change icon to map
+                    this.innerHTML = '<i class="fa-solid fa-map"></i>'; 
                     this.title = 'Map View';
                     mapView.classList.remove('active');
                     tableView.classList.add('active');
                 } else {
                     this.classList.remove('active');
-                    this.innerHTML = '<i class="fa-solid fa-table"></i>'; // Change icon to table
+                    this.innerHTML = '<i class="fa-solid fa-table"></i>'; 
                     this.title = 'Table View';
                     tableView.classList.remove('active');
                     mapView.classList.add('active');
@@ -455,11 +507,10 @@
 
             document.getElementById('locationBtn').addEventListener('click', function() {
                 if (!navigator.geolocation) { alert("Geolocation is not supported by your browser."); return; }
-                
                 if(isTableMode) document.getElementById('tableViewBtn').click();
 
                 let originalHTML = this.innerHTML; 
-                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; // Loading spinner icon
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; 
                 
                 navigator.geolocation.getCurrentPosition(
                     function(position) {
@@ -467,7 +518,6 @@
                         let lat = position.coords.latitude; let lon = position.coords.longitude;
                         if (userLocationMarker) map.removeLayer(userLocationMarker);
                         
-                        // Distinct Emerald Green color for My Location
                         userLocationMarker = L.circleMarker([lat, lon], { 
                             radius: 8, fillColor: "var(--success)", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 
                         }).addTo(map);
@@ -518,17 +568,14 @@
             renderMap();
             renderTable();
 
-            // Update Text Summary
             let count = filteredData.length;
             document.getElementById('sumTotal').textContent = count;
             document.getElementById('sumAvg').textContent = count > 0 ? (totalPcf / count).toFixed(3) : "0.00";
             
-            // Update Mini Histogram
             renderMiniChart();
         }
 
         function renderMiniChart() {
-            // Create 15 bins for PCF ranging from 0.0 to 1.5+
             let binCount = 15;
             let bins = new Array(binCount).fill(0);
             let maxPcfScale = 1.5;
@@ -619,10 +666,9 @@
                 }).addTo(map);
             }
 
-            // ========== 修改的核心代码：仅在首次加载时自动适应边界缩放，防止拖动滑块时地图视角乱跳 ==========
             if (isInitialLoad && bounds.length > 0) {
                 map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
-                isInitialLoad = false; // 标记为已完成初次加载
+                isInitialLoad = false; 
             }
         }
 
@@ -630,7 +676,6 @@
             let tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
             
-            // Custom Natural Sort by Pole ID Ascending
             let sortedData = [...filteredData].sort((a, b) => {
                 let aParsed = parsePoleId(a.id);
                 let bParsed = parsePoleId(b.id);
