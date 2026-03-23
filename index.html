@@ -24,53 +24,50 @@
             --success: #2ecc71; 
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
-            --radius: 4px;
+            --radius: 3px; /* Scaled down */
         }
 
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; font-size: 11px; }
         
         /* --- Login Overlay --- */
         #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-main); z-index: 9999; display: flex; justify-content: center; align-items: center; }
-        .login-box { background: var(--bg-panel); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow-md); text-align: center; width: 340px; border: 1px solid var(--border-color); }
-        .login-box h3 { margin-top: 0; margin-bottom: 24px; font-size: 20px; font-weight: 600; color: var(--text-main); }
-        .login-box input { width: 100%; padding: 10px 12px; margin-bottom: 16px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 14px; box-sizing: border-box; outline: none; transition: all 0.2s; }
-        .login-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1); }
-        .error-msg { color: var(--danger); font-size: 13px; margin-bottom: 16px; display: none; text-align: left; background: #ffe9e5; padding: 8px; border-radius: 4px; border: 1px solid #f9c2b7;}
-        .login-box .btn-primary { width: 100%; justify-content: center; padding: 10px; font-size: 15px; }
+        .login-box { background: var(--bg-panel); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow-md); text-align: center; width: 260px; border: 1px solid var(--border-color); }
+        .login-box h3 { margin-top: 0; margin-bottom: 18px; font-size: 16px; font-weight: 600; color: var(--text-main); }
+        .login-box input { width: 100%; padding: 8px 10px; margin-bottom: 12px; border: 1px solid var(--border-color); border-radius: var(--radius); font-size: 11px; box-sizing: border-box; outline: none; transition: all 0.2s; }
+        .login-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(0, 82, 204, 0.1); }
+        .error-msg { color: var(--danger); font-size: 10px; margin-bottom: 12px; display: none; text-align: left; background: #ffe9e5; padding: 6px; border-radius: 3px; border: 1px solid #f9c2b7;}
+        .login-box .btn-primary { width: 100%; justify-content: center; padding: 8px; font-size: 12px; }
 
         /* --- Main Layout --- */
         #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
         
-        /* --- Three-Row Header --- */
+        /* --- Three-Row Header (Scaled Down 25%) --- */
         #header { background-color: var(--bg-panel); border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-sm); z-index: 1000; display: flex; flex-direction: column; }
         
-        /* Row 1: Title */
-        .header-top { padding: 12px 24px; border-bottom: 1px solid var(--border-color); }
-        .header-title { margin: 0; font-size: 18px; font-weight: 600; color: var(--text-main); letter-spacing: 0.3px; }
+        .header-top { padding: 8px 18px; border-bottom: 1px solid var(--border-color); }
+        .header-title { margin: 0; font-size: 14px; font-weight: 600; color: var(--text-main); letter-spacing: 0.3px; }
         
-        /* Row 2: Filters & Map Toggles */
-        .header-middle { padding: 10px 24px; display: flex; flex-wrap: nowrap; align-items: center; gap: 16px; border-bottom: 1px solid var(--border-color); overflow-x: auto; white-space: nowrap; }
+        .header-middle { padding: 8px 18px; display: flex; flex-wrap: nowrap; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); overflow-x: auto; white-space: nowrap; }
         
-        /* Row 3: Actions */
-        .header-bottom { padding: 8px 24px; display: flex; align-items: center; gap: 12px; background-color: #f9fafb; }
+        .header-bottom { padding: 6px 18px; display: flex; align-items: center; gap: 10px; background-color: #f9fafb; }
         
         /* --- Controls & Inputs --- */
-        .control-group { display: flex; align-items: center; gap: 8px; }
-        .control-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
-        .form-control { padding: 4px 8px; font-size: 13px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--bg-panel); outline: none; transition: all 0.2s; }
+        .control-group { display: flex; align-items: center; gap: 6px; }
+        .control-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+        .form-control { padding: 3px 6px; font-size: 11px; border-radius: var(--radius); border: 1px solid var(--border-color); background: var(--bg-panel); outline: none; transition: all 0.2s; }
         .form-control:focus { border-color: var(--primary); }
-        input[type="text"].form-control { width: 140px; }
+        input[type="text"].form-control { width: 110px; }
         
         /* Sliders */
-        .slider-row { display: flex; align-items: center; gap: 6px; }
-        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 110px; } /* 加长了滑动条 */
-        .pcf-display { display: inline-block; width: 38px; font-weight: 600; color: var(--primary); text-align: right; font-size: 13px; }
+        .slider-row { display: flex; align-items: center; gap: 4px; }
+        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 70px; }
+        .pcf-display { display: inline-block; width: 28px; font-weight: 600; color: var(--primary); text-align: right; font-size: 11px; }
         
-        .divider { width: 1px; height: 20px; background-color: var(--border-color); margin: 0 4px; }
+        .divider { width: 1px; height: 16px; background-color: var(--border-color); margin: 0 2px; }
 
         /* --- Buttons --- */
-        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: var(--radius); font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; gap: 6px; }
-        .btn-icon-only { padding: 6px 12px; font-size: 15px; } 
+        .btn { display: inline-flex; align-items: center; justify-content: center; padding: 4px 10px; border-radius: var(--radius); font-weight: 500; font-size: 11px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; gap: 4px; }
+        .btn-icon-only { padding: 4px 10px; font-size: 12px; } 
         
         .btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
         .btn-primary:hover { background-color: var(--primary-hover); }
@@ -88,45 +85,43 @@
 
         /* --- Summary Overlay on Map --- */
         #summaryPanel {
-            position: absolute; bottom: 24px; left: 24px; background: rgba(255, 255, 255, 0.95);
-            padding: 16px; border-radius: var(--radius); border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-md); z-index: 999; width: 220px;
+            position: absolute; bottom: 18px; left: 18px; background: rgba(255, 255, 255, 0.95);
+            padding: 12px; border-radius: var(--radius); border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md); z-index: 999; width: 180px;
             backdrop-filter: blur(4px); transition: width 0.3s ease;
         }
         
-        /* Collapsible Header Styling */
-        .summary-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 12px; transition: all 0.3s; }
+        .summary-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 2px solid var(--border-color); padding-bottom: 6px; margin-bottom: 8px; transition: all 0.3s; }
         .summary-header.collapsed { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .summary-title { font-weight: 600; font-size: 14px; color: var(--text-main); letter-spacing: 0.3px; margin: 0; }
-        .toggle-icon { font-size: 12px; color: var(--text-muted); transition: transform 0.3s; }
+        .summary-title { font-weight: 600; font-size: 11px; color: var(--text-main); margin: 0; } /* Removed all caps */
+        .toggle-icon { font-size: 10px; color: var(--text-muted); transition: transform 0.3s; }
         .toggle-icon.collapsed { transform: rotate(180deg); }
         
-        /* Content to be collapsed */
         #summaryContent { overflow: hidden; transition: max-height 0.3s ease; }
         #summaryContent.collapsed { display: none; }
 
-        .summary-item { margin-bottom: 8px; font-size: 13px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
-        .summary-val { font-weight: 600; font-size: 14px; color: var(--text-main); }
+        .summary-item { margin-bottom: 6px; font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; }
+        .summary-val { font-weight: 600; font-size: 12px; color: var(--text-main); }
         
-        /* Mini Histogram Container */
-        .chart-container { margin-top: 15px; border-top: 1px dashed var(--border-color); padding-top: 10px; }
-        .chart-title { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; text-align: center; }
-        .mini-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 40px; gap: 2px; }
-        .chart-bar { flex: 1; background-color: var(--primary); border-radius: 2px 2px 0 0; min-height: 1px; transition: height 0.2s ease; opacity: 0.8; }
-        .chart-axis { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        .chart-container { margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 8px; }
+        .chart-title { font-size: 9px; color: var(--text-muted); margin-bottom: 4px; text-align: center; }
+        .mini-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 30px; gap: 1px; }
+        .chart-bar { flex: 1; background-color: var(--primary); border-radius: 2px 2px 0 0; min-height: 1px; transition: height 0.1s ease; opacity: 0.8; }
+        .chart-axis { display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); margin-top: 2px; }
 
         /* --- Table View --- */
         #tableContainer { width: 100%; height: 100%; overflow: auto; background: var(--bg-panel); padding: 0; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 13px; }
-        th { background-color: #f9fafb; padding: 12px 24px; font-weight: 600; color: var(--text-muted); position: sticky; top: 0; border-bottom: 1px solid var(--border-color); z-index: 10; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
-        td { padding: 12px 24px; border-bottom: 1px solid var(--bg-main); color: var(--text-main); transition: background-color 0.1s; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 11px; }
+        th { background-color: #f9fafb; padding: 8px 16px; font-weight: 600; color: var(--text-muted); position: sticky; top: 0; border-bottom: 1px solid var(--border-color); z-index: 10; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
+        td { padding: 8px 16px; border-bottom: 1px solid var(--bg-main); color: var(--text-main); transition: background-color 0.1s; }
         tbody tr:hover td { background-color: #f4f6f8; }
         .val-danger { color: var(--danger); font-weight: 600; }
 
         /* --- Map Popups --- */
-        .leaflet-popup-content-wrapper { border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); padding: 4px; }
-        .popup-content { font-size: 13px; line-height: 1.6; color: var(--text-main); min-width: 200px; }
-        .popup-header { border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: var(--primary); }
+        .leaflet-popup-content-wrapper { border-radius: var(--radius); box-shadow: var(--shadow-md); border: 1px solid var(--border-color); padding: 2px; }
+        .popup-content { font-size: 11px; line-height: 1.5; color: var(--text-main); min-width: 160px; }
+        .popup-header { border-bottom: 1px solid var(--border-color); padding-bottom: 6px; margin-bottom: 6px; font-weight: 600; font-size: 12px; color: var(--primary); }
+        .leaflet-tooltip { border-radius: 2px; border: 1px solid #ccc; font-weight: 600; font-size: 10px; padding: 2px 4px;}
     </style>
 </head>
 <body>
@@ -169,17 +164,21 @@
                 
                 <div class="divider"></div>
                 
+                <datalist id="snap-points">
+                    <option value="0.12"></option>
+                </datalist>
+
                 <div class="control-group">
                     <div class="slider-row">
                         <span class="control-label">Min</span>
-                        <input type="range" id="pcfMin" min="0" max="1.5" step="0.01" value="0.00">
+                        <input type="range" id="pcfMin" min="0" max="1.5" step="0.01" value="0.00" list="snap-points">
                         <span class="pcf-display" id="pcfMinValue">0.00</span>
                     </div>
                 </div>
                 <div class="control-group">
                     <div class="slider-row">
                         <span class="control-label">Max</span>
-                        <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
+                        <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50" list="snap-points">
                         <span class="pcf-display" id="pcfMaxValue">1.50+</span>
                     </div>
                 </div>
@@ -190,7 +189,7 @@
                 <button class="btn btn-outline" id="barChartBtn"><i class="fa-solid fa-chart-column"></i> 3D Bar</button>
                 <button class="btn btn-outline" id="heatMapBtn"><i class="fa-solid fa-fire"></i> Heatmap</button>
                 
-                <button class="btn btn-outline btn-icon-only" id="resetBtn" title="Reset All Filters & Views" style="margin-left: 8px;"><i class="fa-solid fa-rotate-right"></i></button>
+                <button class="btn btn-outline btn-icon-only" id="resetBtn" title="Reset All Filters & Views" style="margin-left: 4px;"><i class="fa-solid fa-rotate-right"></i></button>
             </div>
 
             <div class="header-bottom">
@@ -201,14 +200,11 @@
         </div>
 
         <div id="workspace">
-            
             <div id="mapView" class="view-panel active">
                 <div id="map"></div>
                 <div id="summaryPanel">
-                    
                     <div class="summary-header" id="summaryHeader" title="Click to collapse/expand">
-                        <h4 class="summary-title">Data Summary</h4>
-                        <i class="fa-solid fa-chevron-down toggle-icon" id="summaryToggleIcon"></i>
+                        <h4 class="summary-title">Data Summary</h4> <i class="fa-solid fa-chevron-down toggle-icon" id="summaryToggleIcon"></i>
                     </div>
 
                     <div id="summaryContent">
@@ -225,7 +221,6 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -242,12 +237,10 @@
                                 <th>Coordinates</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody">
-                            </tbody>
+                        <tbody id="tableBody"></tbody>
                     </table>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -278,7 +271,6 @@
         loginBtn.addEventListener('click', attemptLogin);
         passwordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') attemptLogin(); });
 
-        // Core State
         let map, markersLayer, heatLayer = null, userLocationMarker = null;
         let allData = [];
         let filteredData = [];
@@ -345,7 +337,6 @@
                     let rawData = results.data;
                     let refLat = null, refLon = null;
 
-                    // Fix for 324 (3)
                     rawData.forEach(row => {
                         if (String(row['Structure Number1']).trim() === '324 (2)') {
                             refLat = row['GPS Lat']; refLon = row['GPS Long'];
@@ -411,27 +402,40 @@
 
             document.getElementById('speciesFilter').addEventListener('change', renderApplication);
             
-            // ========== 核心卡顿修复：拖动时只更新数字，松开时才重绘地图 ==========
+            // ========== 核心卡顿与捕捉(Snap)修复：恢复实时渲染，并加入 JS 吸附手感 ==========
             pcfMinSlider.addEventListener('input', function() {
-                if (parseFloat(this.value) > parseFloat(pcfMaxSlider.value)) pcfMaxSlider.value = this.value;
-                pcfMinValDisplay.textContent = parseFloat(this.value).toFixed(2);
+                let val = parseFloat(this.value);
+                // Magnetic Snap to 0.12
+                if (Math.abs(val - 0.12) <= 0.015) { this.value = 0.12; val = 0.12; }
                 
+                let maxVal = parseFloat(pcfMaxSlider.value);
+                if (isNaN(maxVal)) maxVal = 1.5;
+                
+                if (val > maxVal) pcfMaxSlider.value = this.value;
+                
+                pcfMinValDisplay.textContent = parseFloat(this.value).toFixed(2);
                 let maxDisplay = parseFloat(pcfMaxSlider.value).toFixed(2);
                 pcfMaxValDisplay.textContent = (maxDisplay === "1.50") ? "1.50+" : maxDisplay;
+                
+                renderApplication(); // 恢复实时丝滑渲染
             });
             
             pcfMaxSlider.addEventListener('input', function() {
-                if (parseFloat(this.value) < parseFloat(pcfMinSlider.value)) pcfMinSlider.value = this.value;
-                pcfMinValDisplay.textContent = parseFloat(pcfMinSlider.value).toFixed(2);
+                let val = parseFloat(this.value);
+                // Magnetic Snap to 0.12
+                if (Math.abs(val - 0.12) <= 0.015) { this.value = 0.12; val = 0.12; }
                 
+                let minVal = parseFloat(pcfMinSlider.value);
+                if (isNaN(minVal)) minVal = 0;
+
+                if (val < minVal) pcfMinSlider.value = this.value;
+                
+                pcfMinValDisplay.textContent = parseFloat(pcfMinSlider.value).toFixed(2);
                 let maxDisplay = parseFloat(this.value).toFixed(2);
                 pcfMaxValDisplay.textContent = (maxDisplay === "1.50") ? "1.50+" : maxDisplay;
+                
+                renderApplication(); // 恢复实时丝滑渲染
             });
-
-            // 当滑块拖动结束松手时，才触发数据刷新，彻底解决卡顿！
-            pcfMinSlider.addEventListener('change', renderApplication);
-            pcfMaxSlider.addEventListener('change', renderApplication);
-
 
             // Summary Panel Collapse Toggle
             document.getElementById('summaryHeader').addEventListener('click', function() {
@@ -459,12 +463,10 @@
                 document.getElementById('barChartBtn').classList.remove('active');
                 document.getElementById('heatMapBtn').classList.remove('active');
 
-                // 强制重置视角
                 isInitialLoad = true;
                 renderApplication();
             });
 
-            // Map Mode Toggles
             document.getElementById('colorToggleBtn').addEventListener('click', function() {
                 isColorMode = !isColorMode; this.classList.toggle('active'); renderApplication();
             });
@@ -477,7 +479,6 @@
                 isHeatMode = !isHeatMode; this.classList.toggle('active'); renderApplication();
             });
 
-            // View Switcher
             document.getElementById('tableViewBtn').addEventListener('click', function() {
                 isTableMode = !isTableMode;
                 let mapView = document.getElementById('mapView');
@@ -499,7 +500,6 @@
                 }
             });
 
-            // Actions
             document.getElementById('exportBtn').addEventListener('click', exportData);
 
             document.getElementById('searchBtn').addEventListener('click', searchPole);
@@ -521,7 +521,7 @@
                         if (userLocationMarker) map.removeLayer(userLocationMarker);
                         
                         userLocationMarker = L.circleMarker([lat, lon], { 
-                            radius: 8, fillColor: "var(--success)", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 
+                            radius: 7, fillColor: "var(--success)", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000 
                         }).addTo(map);
                         
                         userLocationMarker.bindTooltip("Current Location").openTooltip();
@@ -553,10 +553,13 @@
         function renderApplication() {
             filteredData = [];
             let selectedSpecies = document.getElementById('speciesFilter').value;
-            let minVal = parseFloat(document.getElementById('pcfMin').value) || 0;
-            let maxVal = parseFloat(document.getElementById('pcfMax').value) || 1.5;
             
-            // 安全机制：如果滑块在最右端1.5，则不再限制最大值，包含所有的异常超高点。
+            // ========== 核心Bug修复：防呆处理空字符串与假值问题 ==========
+            let minStr = document.getElementById('pcfMin').value;
+            let maxStr = document.getElementById('pcfMax').value;
+            let minVal = minStr === "" || isNaN(parseFloat(minStr)) ? 0 : parseFloat(minStr);
+            let maxVal = maxStr === "" || isNaN(parseFloat(maxStr)) ? 1.5 : parseFloat(maxStr);
+            
             let isAtMax = (maxVal >= 1.5);
             let totalPcf = 0;
 
@@ -627,26 +630,26 @@
                 let popupHTML = `
                     <div class="popup-content">
                         <div class="popup-header">Pole ID: ${data.id}</div>
-                        <div style="margin-bottom: 4px;"><b>Species:</b> ${data.species}</div>
-                        <div style="margin-bottom: 4px;"><b>Preservative:</b> ${data.preservative}</div>
-                        <div style="margin-bottom: 4px;"><b>Moisture:</b> ${data.moisture}%</div>
+                        <div style="margin-bottom: 2px;"><b>Species:</b> ${data.species}</div>
+                        <div style="margin-bottom: 2px;"><b>Preservative:</b> ${data.preservative}</div>
+                        <div style="margin-bottom: 2px;"><b>Moisture:</b> ${data.moisture}%</div>
                         <div><b>PCF Concentration:</b> <span style="font-weight:600; color:${data.pcf > 0.5 ? '#de3618' : '#202b36'}">${data.pcf}</span></div>
                     </div>
                 `;
 
                 let marker;
                 if (isBarMode && !isHeatMode) {
-                    let h = Math.max((data.pcf / 1.0) * 80, 6); 
+                    let h = Math.max((data.pcf / 1.0) * 80, 5); 
                     let barHtml = `
-                        <div style="width:12px; height:${h}px; background-color:${markerColor}; 
-                        box-shadow: 2px 2px 5px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.6); border-bottom: 1px solid #333;"></div>
+                        <div style="width:10px; height:${h}px; background-color:${markerColor}; 
+                        box-shadow: 2px 2px 4px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.6); border-bottom: 1px solid #333;"></div>
                     `;
-                    let barIcon = L.divIcon({ html: barHtml, className: '', iconSize: [12, h], iconAnchor: [6, h], popupAnchor: [0, -h] });
+                    let barIcon = L.divIcon({ html: barHtml, className: '', iconSize: [10, h], iconAnchor: [5, h], popupAnchor: [0, -h] });
                     marker = L.marker([data.lat, data.lon], { icon: barIcon });
                 } else if (!isHeatMode) {
-                    marker = L.circleMarker([data.lat, data.lon], { radius: 6, fillColor: markerColor, color: "#fff", weight: 1.5, opacity: 1, fillOpacity: 0.85 });
-                    marker.on('mouseover', function () { this.setStyle({ radius: 8, weight: 2 }); });
-                    marker.on('mouseout', function () { this.setStyle({ radius: 6, weight: 1.5 }); });
+                    marker = L.circleMarker([data.lat, data.lon], { radius: 5, fillColor: markerColor, color: "#fff", weight: 1, opacity: 1, fillOpacity: 0.85 });
+                    marker.on('mouseover', function () { this.setStyle({ radius: 7, weight: 2 }); });
+                    marker.on('mouseout', function () { this.setStyle({ radius: 5, weight: 1 }); });
                 }
 
                 if (!isHeatMode) {
@@ -666,13 +669,13 @@
 
             if (isHeatMode && heatData.length > 0) {
                 heatLayer = L.heatLayer(heatData, {
-                    radius: 20, blur: 15, maxZoom: 14, 
+                    radius: 18, blur: 12, maxZoom: 14, 
                     gradient: {0.2: '#0052cc', 0.4: '#00a3bf', 0.6: '#57d9a3', 0.8: '#ffc400', 1.0: '#de3618'}
                 }).addTo(map);
             }
 
             if (isInitialLoad && bounds.length > 0) {
-                map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+                map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
                 isInitialLoad = false; 
             }
         }
@@ -707,7 +710,7 @@
                     <td>${data.moisture}</td>
                     <td>${data.preservative}</td>
                     <td ${pcfStyle}>${data.pcf.toFixed(3)}</td>
-                    <td style="color:var(--text-muted); font-size: 12px;">${data.lat.toFixed(5)}, ${data.lon.toFixed(5)}</td>
+                    <td style="color:var(--text-muted); font-size: 10px;">${data.lat.toFixed(5)}, ${data.lon.toFixed(5)}</td>
                 `;
                 tbody.appendChild(tr);
             });
