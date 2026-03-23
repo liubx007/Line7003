@@ -21,7 +21,7 @@
             --primary: #0052cc;
             --primary-hover: #0043a6;
             --danger: #de3618;
-            --success: #2ecc71;
+            --success: #2ecc71; /* Emerald Green for Location */
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.08);
             --radius: 4px;
@@ -70,7 +70,7 @@
 
         /* --- Buttons --- */
         .btn { display: inline-flex; align-items: center; justify-content: center; padding: 6px 14px; border-radius: var(--radius); font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; background: transparent; gap: 6px; }
-        .btn-icon-only { padding: 6px 12px; font-size: 15px; } /* For icon-only buttons */
+        .btn-icon-only { padding: 6px 12px; font-size: 15px; } 
         
         .btn-primary { background-color: var(--primary); color: white; border-color: var(--primary); }
         .btn-primary:hover { background-color: var(--primary-hover); }
@@ -268,6 +268,7 @@
         let isBarMode = false;
         let isHeatMode = false;
         let isTableMode = false;
+        let isInitialLoad = true; // 新增：用于防止每次筛选时地图视角重置
 
         function initializeDashboard() {
             // Original OpenStreetMap Base
@@ -351,6 +352,12 @@
                             if (!isNaN(parsed)) pcfValue = parsed;
                         }
 
+                        if (pcfValue !== 0) {
+                            row['Preservative3'] = 'Pentachlorophenol';
+                        }
+                        
+                        let finalPreservative = row['Preservative3'] || 'N/A';
+
                         if (lat !== null && lon !== null) {
                             let key = `${lat.toFixed(5)},${lon.toFixed(5)}`;
                             if (coordOccurrences[key] !== undefined) {
@@ -369,7 +376,7 @@
                                 species: standardizeSpecies(row['Wood Species2']),
                                 pcf: pcfValue,
                                 moisture: row['Moisture %'] || 'N/A',
-                                preservative: row['Preservative3'] || 'N/A'
+                                preservative: finalPreservative
                             });
                         }
                     });
@@ -612,7 +619,11 @@
                 }).addTo(map);
             }
 
-            if (bounds.length > 0 && !userLocationMarker) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+            // ========== 修改的核心代码：仅在首次加载时自动适应边界缩放，防止拖动滑块时地图视角乱跳 ==========
+            if (isInitialLoad && bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+                isInitialLoad = false; // 标记为已完成初次加载
+            }
         }
 
         function renderTable() {
