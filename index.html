@@ -11,86 +11,172 @@
 
     <style>
         :root {
-            /* Dalhousie University Brand Colors */
-            --dal-black: #222222;
-            --dal-gold: #FFD400;
-            --dal-light-grey: #f4f4f4;
+            --bg-color: #ffffff;
+            --text-color: #2c3e50;
+            --primary: #3498db;
+            --primary-hover: #2980b9;
+            --border-color: #e0e6ed;
+            --shadow: rgba(0, 0, 0, 0.08);
         }
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: var(--dal-light-grey); color: var(--dal-black); }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; height: 100vh; background-color: #f8f9fa; color: var(--text-color); overflow: hidden; }
         
+        /* --- Login Overlay Styling --- */
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #f8f9fa; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .login-box {
+            background: white; padding: 40px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
+            width: 300px; border: 1px solid var(--border-color);
+        }
+        .login-box h3 { margin-top: 0; color: var(--text-color); margin-bottom: 20px; font-size: 22px; }
+        .login-box input {
+            width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc;
+            border-radius: 6px; font-size: 16px; box-sizing: border-box; outline: none;
+        }
+        .login-box input:focus { border-color: var(--primary); }
+        .error-msg { color: #e74c3c; font-size: 13px; margin-bottom: 15px; display: none; }
+        .login-box .btn { width: 100%; justify-content: center; padding: 10px; font-size: 16px; }
+
+        /* Main Dashboard (Hidden initially) */
+        #mainDashboard { display: none; flex-direction: column; height: 100%; width: 100%; }
+
         /* Header Styling */
-        #header { padding: 15px 30px; background-color: var(--dal-black); color: white; display: flex; align-items: center; justify-content: space-between; border-bottom: 4px solid var(--dal-gold); box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; }
-        .header-left { display: flex; align-items: center; gap: 20px; }
-        .header-left img { height: 45px; }
-        .header-left h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: 0.5px; }
+        #header { padding: 15px 25px; background-color: var(--bg-color); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); box-shadow: 0 4px 15px var(--shadow); z-index: 1000; gap: 15px;}
+        .header-title { margin: 0; font-size: 20px; font-weight: 600; color: var(--text-color); display: flex; align-items: center; gap: 10px; }
         
         /* Control Panel Styling */
-        .controls { display: flex; align-items: center; gap: 25px; font-size: 14px; }
-        .control-group { display: flex; align-items: center; gap: 10px; }
-        select { padding: 6px 10px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; }
-        input[type="range"] { cursor: pointer; accent-color: var(--dal-gold); width: 120px; }
-        .pcf-display { display: inline-block; width: 40px; font-weight: bold; color: var(--dal-gold); }
+        .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; font-size: 13px; }
+        .control-group { display: flex; align-items: center; gap: 8px; background: #f8f9fa; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+        select { padding: 4px 8px; font-size: 13px; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; outline: none; background: white; }
+        
+        /* Range Sliders */
+        .slider-container { display: flex; flex-direction: column; gap: 4px; }
+        .slider-row { display: flex; align-items: center; gap: 8px; }
+        input[type="range"] { cursor: pointer; accent-color: var(--primary); width: 100px; }
+        .pcf-display { display: inline-block; width: 30px; font-weight: 600; color: var(--primary); text-align: right; }
         
         /* Buttons */
-        .btn-export { background-color: var(--dal-gold); color: var(--dal-black); border: none; padding: 8px 18px; border-radius: 4px; font-weight: bold; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
-        .btn-export:hover { background-color: #e6bf00; transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .btn-export:active { transform: translateY(0); }
+        .btn { background-color: var(--primary); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3); }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); box-shadow: 0 4px 8px rgba(52, 152, 219, 0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn-toggle { background-color: #fff; color: var(--text-color); border: 1px solid var(--border-color); box-shadow: none; }
+        .btn-toggle:hover { background-color: #f1f2f6; }
+        .btn-toggle.active { background-color: #fff3e0; border-color: #ff9800; color: #e65100; box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2); }
         
         /* Map Container */
         #map { flex: 1; width: 100%; }
         
         /* Popup Styling */
-        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .popup-content { font-size: 14px; line-height: 1.6; color: #333; min-width: 180px; }
-        .popup-header { border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 6px; font-weight: bold; color: var(--dal-black); font-size: 15px; }
-        .highlight { color: #d9534f; font-weight: bold; font-size: 15px;}
+        .leaflet-popup-content-wrapper { border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.05); }
+        .popup-content { font-size: 13px; line-height: 1.6; color: #444; min-width: 170px; }
+        .popup-header { border-bottom: 1px solid #eee; padding-bottom: 6px; margin-bottom: 6px; font-weight: 600; color: var(--text-color); font-size: 14px; }
+        .highlight { color: #e74c3c; font-weight: bold; font-size: 14px;}
     </style>
 </head>
 <body>
 
-    <div id="header">
-        <div class="header-left">
-            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Dalhousie_University_logo.svg/1200px-Dalhousie_University_logo.svg.png" alt="Dalhousie Logo" style="filter: brightness(0) invert(1);">
-            <h2>Line 7003 Inspection Data</h2>
-        </div>
-        
-        <div class="controls">
-            <div class="control-group">
-                <label for="speciesFilter"><strong>Species:</strong></label>
-                <select id="speciesFilter">
-                    <option value="ALL">All Species</option>
-                    <option value="Red Pine">Red Pine</option>
-                    <option value="West Red Cedar">West Red Cedar</option>
-                    <option value="South Yellow Pine">South Yellow Pine</option>
-                    <option value="D.Fir">D.Fir</option>
-                    <option value="Other">Other / Unknown</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="pcfFilter"><strong>Min PCF:</strong> <span class="pcf-display" id="pcfValue">0.00</span></label>
-                <input type="range" id="pcfFilter" min="0" max="1.0" step="0.01" value="0">
-            </div>
-
-            <button class="btn-export" id="exportBtn">Export to CSV</button>
+    <div id="loginOverlay">
+        <div class="login-box">
+            <h3>🔒 Access Required</h3>
+            <input type="password" id="passwordInput" placeholder="Enter Password">
+            <div id="errorMsg" class="error-msg">Incorrect password. Please try again.</div>
+            <button class="btn" id="loginBtn">Enter Dashboard</button>
         </div>
     </div>
 
-    <div id="map"></div>
+    <div id="mainDashboard">
+        <div id="header">
+            <h2 class="header-title">🌲 Line 7003 Inspection</h2>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="speciesFilter"><strong>Species:</strong></label>
+                    <select id="speciesFilter">
+                        <option value="ALL">All</option>
+                        <option value="Red Pine">Red Pine</option>
+                        <option value="West Red Cedar">West Red Cedar</option>
+                        <option value="South Yellow Pine">South Yellow Pine</option>
+                        <option value="D.Fir">D.Fir</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="control-group slider-container">
+                    <div class="slider-row">
+                        <label><strong>Min:</strong></label>
+                        <input type="range" id="pcfMin" min="0" max="1.0" step="0.01" value="0">
+                        <span class="pcf-display" id="pcfMinValue">0.00</span>
+                    </div>
+                    <div class="slider-row">
+                        <label><strong>Max:</strong></label>
+                        <input type="range" id="pcfMax" min="0" max="1.5" step="0.01" value="1.50">
+                        <span class="pcf-display" id="pcfMaxValue">1.50</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-toggle" id="colorToggleBtn">🎨 Color by PCF</button>
+                <button class="btn" id="locationBtn">📍 My Location</button>
+                <button class="btn" id="exportBtn">📥 Export CSV</button>
+            </div>
+        </div>
+
+        <div id="map"></div>
+    </div>
 
     <script>
-        // Initialize Map with a clean, light base map
-        const map = L.map('map').setView([45.5, -62.0], 9);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-            maxZoom: 19
-        }).addTo(map);
+        // ==========================================
+        // 🔒 在这里设置你的网页访问密码！
+        const CORRECT_PASSWORD = "7003"; 
+        // ==========================================
 
+        const loginOverlay = document.getElementById('loginOverlay');
+        const mainDashboard = document.getElementById('mainDashboard');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // 登录逻辑
+        function attemptLogin() {
+            if (passwordInput.value === CORRECT_PASSWORD) {
+                loginOverlay.style.display = 'none';
+                mainDashboard.style.display = 'flex';
+                initializeDashboard(); // 密码正确后才开始加载地图和数据
+            } else {
+                errorMsg.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+        }
+
+        loginBtn.addEventListener('click', attemptLogin);
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') attemptLogin();
+        });
+
+        // 核心变量
+        let map, markersLayer, userLocationMarker;
         let allData = [];
         let filteredDataForExport = [];
-        let markersLayer = L.layerGroup().addTo(map);
+        let isColorGradientMode = false;
 
-        // Utility: Clean Coordinates (Handles "61.45893 W" and "-63.30878" formats)
+        // 初始化主界面
+        function initializeDashboard() {
+            // 初始化地图
+            map = L.map('map').setView([45.5, -62.0], 9);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            markersLayer = L.layerGroup().addTo(map);
+            loadData(); // 开始读取CSV
+            setupEventListeners();
+        }
+
+        // 坐标清理
         function cleanCoord(coordStr) {
             if (!coordStr) return null;
             let str = String(coordStr).toUpperCase().trim();
@@ -104,7 +190,7 @@
             return null;
         }
 
-        // Utility: Standardize Wood Species based on requirements
+        // 树种标准化
         function standardizeSpecies(rawSpecies) {
             if (!rawSpecies) return 'Other';
             let s = rawSpecies.trim().toUpperCase();
@@ -115,144 +201,178 @@
             return 'Other';
         }
 
-        // Load and Process CSV Data
-        Papa.parse("Line 7003 Final Data.csv", {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            complete: function(results) {
-                let rawData = results.data;
-                let ref324_2_Lat = null;
-                let ref324_2_Lon = null;
+        // 浓度渐变色算法
+        function getMarkerColor(pcf) {
+            if (!isColorGradientMode) return "#3498db"; 
+            if (pcf <= 0) return "#bdc3c7"; 
+            let ratio = Math.min(pcf, 0.5) / 0.5;
+            let hue = 60 - (ratio * 60);
+            return `hsl(${hue}, 100%, 50%)`;
+        }
 
-                // First pass: Find 324 (2) coordinates to fix 324 (3)
-                rawData.forEach(row => {
-                    let structNum = String(row['Structure Number1']).trim();
-                    if (structNum === '324 (2)') {
-                        ref324_2_Lat = row['GPS Lat'];
-                        ref324_2_Lon = row['GPS Long'];
-                    }
-                });
+        // 读取并处理数据
+        function loadData() {
+            Papa.parse("Line 7003 Final Data.csv", {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    let rawData = results.data;
+                    let ref324_2_Lat = null; let ref324_2_Lon = null;
 
-                // Second pass: Clean, structure, and handle overlapping points
-                let coordOccurrences = {}; 
+                    rawData.forEach(row => {
+                        if (String(row['Structure Number1']).trim() === '324 (2)') {
+                            ref324_2_Lat = row['GPS Lat']; ref324_2_Lon = row['GPS Long'];
+                        }
+                    });
 
-                rawData.forEach(row => {
-                    let structNum = String(row['Structure Number1']).trim();
-                    
-                    // Apply hardcoded fix for 324 (3)
-                    if (structNum === '324 (3)' && ref324_2_Lat) {
-                        row['GPS Lat'] = ref324_2_Lat;
-                        row['GPS Long'] = ref324_2_Lon;
-                    }
+                    let coordOccurrences = {}; 
 
-                    let lat = cleanCoord(row['GPS Lat']);
-                    let lon = cleanCoord(row['GPS Long']);
-                    let species = standardizeSpecies(row['Wood Species2']);
-                    
-                    // Handle PCF Parsing
-                    let pcfStr = row['Sawdust Progrqm PCF'];
-                    let pcfValue = 0;
-                    if (pcfStr) {
-                        let parsed = parseFloat(String(pcfStr).replace(/[^0-9.-]/g, ''));
-                        if (!isNaN(parsed)) pcfValue = parsed;
-                    }
-
-                    if (lat !== null && lon !== null) {
-                        // Offset overlapping coordinates slightly so they don't cover each other
-                        let coordKey = `${lat.toFixed(5)},${lon.toFixed(5)}`;
-                        if (coordOccurrences[coordKey] !== undefined) {
-                            coordOccurrences[coordKey]++;
-                            let offsetMultiplier = coordOccurrences[coordKey];
-                            // Add roughly 5 meters of offset per overlapping point
-                            lat += 0.00005 * offsetMultiplier; 
-                            lon += 0.00005 * offsetMultiplier;
-                        } else {
-                            coordOccurrences[coordKey] = 0;
+                    rawData.forEach(row => {
+                        let structNum = String(row['Structure Number1']).trim();
+                        if (structNum === '324 (3)' && ref324_2_Lat) {
+                            row['GPS Lat'] = ref324_2_Lat; row['GPS Long'] = ref324_2_Lon;
                         }
 
-                        // Store processed row
-                        row.cleanLat = lat;
-                        row.cleanLon = lon;
-                        row.stdSpecies = species;
-                        row.pcfValue = pcfValue;
-                        allData.push(row);
-                    }
-                });
+                        let lat = cleanCoord(row['GPS Lat']);
+                        let lon = cleanCoord(row['GPS Long']);
+                        
+                        let pcfStr = row['Sawdust Progrqm PCF'];
+                        let pcfValue = 0;
+                        if (pcfStr) {
+                            let parsed = parseFloat(String(pcfStr).replace(/[^0-9.-]/g, ''));
+                            if (!isNaN(parsed)) pcfValue = parsed;
+                        }
 
+                        if (lat !== null && lon !== null) {
+                            let coordKey = `${lat.toFixed(5)},${lon.toFixed(5)}`;
+                            if (coordOccurrences[coordKey] !== undefined) {
+                                coordOccurrences[coordKey]++;
+                                lat += 0.00005 * coordOccurrences[coordKey]; 
+                                lon += 0.00005 * coordOccurrences[coordKey];
+                            } else {
+                                coordOccurrences[coordKey] = 0;
+                            }
+
+                            row.cleanLat = lat;
+                            row.cleanLon = lon;
+                            row.stdSpecies = standardizeSpecies(row['Wood Species2']);
+                            row.pcfValue = pcfValue;
+                            allData.push(row);
+                        }
+                    });
+                    renderMap();
+                }
+            });
+        }
+
+        // 绑定界面控件事件
+        function setupEventListeners() {
+            const speciesFilter = document.getElementById('speciesFilter');
+            const pcfMin = document.getElementById('pcfMin');
+            const pcfMax = document.getElementById('pcfMax');
+            const pcfMinValue = document.getElementById('pcfMinValue');
+            const pcfMaxValue = document.getElementById('pcfMaxValue');
+            const colorToggleBtn = document.getElementById('colorToggleBtn');
+            const locationBtn = document.getElementById('locationBtn');
+            const exportBtn = document.getElementById('exportBtn');
+
+            speciesFilter.addEventListener('change', renderMap);
+            
+            pcfMin.addEventListener('input', function(e) {
+                if (parseFloat(pcfMin.value) > parseFloat(pcfMax.value)) pcfMax.value = pcfMin.value;
+                pcfMinValue.textContent = parseFloat(pcfMin.value).toFixed(2);
+                pcfMaxValue.textContent = parseFloat(pcfMax.value).toFixed(2);
                 renderMap();
-            },
-            error: function(err) {
-                console.error("Error loading CSV:", err);
-                alert("Failed to load CSV data. Please ensure the file is named exactly 'Line 7003 Final Data.csv'.");
-            }
-        });
+            });
+            
+            pcfMax.addEventListener('input', function(e) {
+                if (parseFloat(pcfMax.value) < parseFloat(pcfMin.value)) pcfMin.value = pcfMax.value;
+                pcfMinValue.textContent = parseFloat(pcfMin.value).toFixed(2);
+                pcfMaxValue.textContent = parseFloat(pcfMax.value).toFixed(2);
+                renderMap();
+            });
 
-        // Event Listeners for Controls
-        const speciesFilter = document.getElementById('speciesFilter');
-        const pcfFilter = document.getElementById('pcfFilter');
-        const pcfValueDisplay = document.getElementById('pcfValue');
-        const exportBtn = document.getElementById('exportBtn');
+            colorToggleBtn.addEventListener('click', function() {
+                isColorGradientMode = !isColorGradientMode;
+                this.classList.toggle('active');
+                renderMap();
+            });
 
-        speciesFilter.addEventListener('change', renderMap);
-        
-        pcfFilter.addEventListener('input', function(e) {
-            let val = parseFloat(e.target.value).toFixed(2);
-            pcfValueDisplay.textContent = val;
-            renderMap();
-        });
+            exportBtn.addEventListener('click', exportToCSV);
 
-        exportBtn.addEventListener('click', exportToCSV);
+            locationBtn.addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    alert("Your browser doesn't support geolocation.");
+                    return;
+                }
+                let originalText = this.innerHTML;
+                this.innerHTML = "⏳ Locating...";
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        locationBtn.innerHTML = originalText;
+                        let lat = position.coords.latitude;
+                        let lon = position.coords.longitude;
+                        
+                        if (userLocationMarker) map.removeLayer(userLocationMarker);
+                        
+                        userLocationMarker = L.circleMarker([lat, lon], {
+                            radius: 5, fillColor: "#007bff", color: "#ffffff", weight: 2, opacity: 1, fillOpacity: 1, zIndexOffset: 1000
+                        }).addTo(map);
+                        
+                        userLocationMarker.bindTooltip("You are here").openTooltip();
+                        map.flyTo([lat, lon], 14, { duration: 1.5 });
+                    }, 
+                    function(error) {
+                        locationBtn.innerHTML = originalText;
+                        alert("Unable to retrieve location. Please check browser permissions.");
+                    }, 
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                );
+            });
+        }
 
-        // Core Render Function
+        // 渲染地图
         function renderMap() {
             markersLayer.clearLayers();
             filteredDataForExport = [];
             
-            let selectedSpecies = speciesFilter.value;
-            let minPcf = parseFloat(pcfFilter.value);
+            let selectedSpecies = document.getElementById('speciesFilter').value;
+            let minVal = parseFloat(document.getElementById('pcfMin').value);
+            let maxVal = parseFloat(document.getElementById('pcfMax').value);
             let bounds = [];
 
             allData.forEach(row => {
                 let matchSpecies = (selectedSpecies === "ALL" || row.stdSpecies === selectedSpecies);
-                let matchPcf = (row.pcfValue >= minPcf);
+                let matchPcf = (row.pcfValue >= minVal && row.pcfValue <= maxVal);
 
                 if (matchSpecies && matchPcf) {
                     filteredDataForExport.push(row);
                     let structureNum = row['Structure Number1'] || 'N/A';
                     let displayPcf = row['Sawdust Progrqm PCF'] || '0';
-                    let preservative = row['Preservative3'] || 'N/A';
-                    let moisture = row['Moisture %'] || 'N/A';
+                    let markerColor = getMarkerColor(row.pcfValue);
                     
                     let popupHTML = `
                         <div class="popup-content">
                             <div class="popup-header">Structure: ${structureNum}</div>
                             <b>Species:</b> ${row.stdSpecies}<br>
-                            <b>Preservative:</b> ${preservative}<br>
-                            <b>Moisture:</b> ${moisture}%<br>
-                            <b>PCF Conc:</b> <span class="highlight">${displayPcf}</span>
+                            <b>Moisture:</b> ${row['Moisture %'] || 'N/A'}%<br>
+                            <b>PCF Conc:</b> <span class="highlight" style="color:${isColorGradientMode ? markerColor : '#e74c3c'}">${displayPcf}</span>
                         </div>
                     `;
 
-                    // Create Circle Marker with aesthetic styling
                     let marker = L.circleMarker([row.cleanLat, row.cleanLon], {
-                        radius: 6,
-                        fillColor: "#e74c3c", // Base red color
-                        color: "#ffffff",
-                        weight: 1.5,
-                        opacity: 1,
-                        fillOpacity: 0.85
+                        radius: 6, fillColor: markerColor, color: "#ffffff", weight: 1.5, opacity: 1, fillOpacity: 0.85
                     });
 
-                    // Add hover/snap effects (changes color and size on hover)
                     marker.on('mouseover', function (e) {
                         this.openTooltip();
-                        this.setStyle({ radius: 9, fillColor: "#2ecc71", weight: 2, fillOpacity: 1 });
+                        this.setStyle({ radius: 9, weight: 2, fillOpacity: 1 });
                     });
-                    
                     marker.on('mouseout', function (e) {
                         this.closeTooltip();
-                        this.setStyle({ radius: 6, fillColor: "#e74c3c", weight: 1.5, fillOpacity: 0.85 });
+                        this.setStyle({ radius: 6, weight: 1.5, fillOpacity: 0.85 });
                     });
 
                     marker.bindPopup(popupHTML);
@@ -263,38 +383,27 @@
                 }
             });
 
-            // Adjust map view to fit all currently visible points
-            if (bounds.length > 0) {
+            if (bounds.length > 0 && !userLocationMarker) {
                 map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
             }
         }
 
-        // Export Functionality
+        // 导出 CSV
         function exportToCSV() {
             if (filteredDataForExport.length === 0) {
                 alert("No data available to export based on current filters.");
                 return;
             }
-            
-            // Remove internal JS properties before exporting
             const cleanData = filteredDataForExport.map(row => {
                 const newRow = Object.assign({}, row);
-                delete newRow.cleanLat;
-                delete newRow.cleanLon;
-                delete newRow.stdSpecies;
-                delete newRow.pcfValue;
+                delete newRow.cleanLat; delete newRow.cleanLon; delete newRow.stdSpecies; delete newRow.pcfValue;
                 return newRow;
             });
-
-            // Generate and download CSV
             const csvString = Papa.unparse(cleanData);
             const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            
-            link.setAttribute("href", url);
-            link.setAttribute("download", "Filtered_Line_7003_Export.csv");
-            link.style.visibility = 'hidden';
+            link.href = URL.createObjectURL(blob);
+            link.download = "Filtered_Line_7003_Export.csv";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
