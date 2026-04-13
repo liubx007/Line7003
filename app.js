@@ -42,6 +42,13 @@ let currentSortCol = 'id';
 let currentSortAsc = true;
 
 function initializeDashboard() {
+    // Mobile Detection: Auto-collapse panels on small screens to save map view
+    if (window.innerWidth <= 768) {
+        document.getElementById('summaryContent').classList.add('collapsed');
+        document.getElementById('summaryToggleIcon').classList.add('collapsed');
+        document.getElementById('summaryHeader').classList.add('collapsed');
+    }
+
     // Add preferCanvas: true for massive performance gains with 1000s of markers
     map = L.map('map', { preferCanvas: true }).setView([45.5, -62.0], 9);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
