@@ -591,10 +591,40 @@ updateSortIcons();
 // Tour Feature
 // ==========================================
 function startTour() {
-    localStorage.setItem('dashboardTourShown', 'true'); // Save immediately when started
+    localStorage.setItem('dashboardTourShown', 'true');
     const driver = window.driver.js.driver;
-    const driverObj = driver({
+    
+    let driverObj;
+
+    function handleTourClick(e) {
+        // User clicked the Skip button (previously Next)
+        if (e.target.closest('.driver-popover-next-btn')) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (driverObj) driverObj.destroy();
+            return;
+        }
+        
+        // Let Previous/Close buttons behave normally
+        if (e.target.closest('.driver-popover-prev-btn') || e.target.closest('.driver-popover-close-btn')) {
+            return;
+        }
+
+        // Clicking literally anywhere else acts as a 'Next' progression (or finishes if final)
+        e.preventDefault();
+        e.stopPropagation();
+        if (driverObj) driverObj.moveNext();
+    }
+
+    driverObj = driver({
         showProgress: true,
+        nextBtnText: 'Skip',
+        doneBtnText: 'Skip',
+        allowClose: false, // Prevent standard overlay exit so our custom handler dictates all
+        onDestroyStarted: () => {
+            document.removeEventListener('click', handleTourClick, true);
+            driverObj.destroy();
+        },
         steps: [
             { element: '#searchGroup', popover: { title: 'Search Poles', description: 'Quickly find a specific pole by typing its ID here.', side: "bottom", align: 'start' } },
             { element: '#filterGroup', popover: { title: 'Refine Data', description: 'Filter the visible poles by Wood Species and PCF Concentration.', side: "bottom", align: 'start' } },
@@ -603,5 +633,7 @@ function startTour() {
             { element: '#tourBtn', popover: { title: 'System Help', description: 'Need a refresher? Click this Help button anytime to replay this guided tour.', side: "bottom", align: 'end' } }
         ]
     });
+
+    document.addEventListener('click', handleTourClick, true);
     driverObj.drive();
 }
