@@ -455,10 +455,12 @@ input.leaflet-control-layers-selector:checked + span .map-preview-name {
 }
 .leaflet-control-layers.tour-locked .collapsed-badge {
     display: flex !important;
+    z-index: 100001 !important;
 }
 .leaflet-control-layers.tour-locked {
     padding: 4px !important;
     border-radius: 12px !important;
+    z-index: 100001 !important;
 }
 
 /* --- Zoom Controls (Glassmorphism) --- */

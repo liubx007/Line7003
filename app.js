@@ -615,24 +615,17 @@ function startTour() {
         e.stopPropagation();
         if (driverObj) driverObj.moveNext();
     }
+    // Lock the layer control in collapsed state for the entire tour
+    const layerCtrl = document.querySelector('.leaflet-control-layers');
+    if (layerCtrl) layerCtrl.classList.add('tour-locked');
 
     driverObj = driver({
         showProgress: true,
-        nextBtnText: 'Skip',
-        doneBtnText: 'Skip',
+        nextBtnText: 'Next',
+        doneBtnText: 'Done',
         allowClose: false,
-        onHighlightStarted: (el) => {
-            // Lock collapsed state when layer control is highlighted
-            const layerCtrl = document.querySelector('.leaflet-control-layers');
-            if (layerCtrl) layerCtrl.classList.add('tour-locked');
-        },
-        onDeselected: () => {
-            const layerCtrl = document.querySelector('.leaflet-control-layers');
-            if (layerCtrl) layerCtrl.classList.remove('tour-locked');
-        },
         onDestroyStarted: () => {
             document.removeEventListener('click', handleTourClick, true);
-            const layerCtrl = document.querySelector('.leaflet-control-layers');
             if (layerCtrl) layerCtrl.classList.remove('tour-locked');
             driverObj.destroy();
         },
