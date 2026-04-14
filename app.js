@@ -68,13 +68,18 @@ function initializeDashboard() {
     // Add default map layer
     standardMap.addTo(map);
 
+    // Create map preview labels (using static tile coordinates for preview images)
+    let standardHtml = `<div class="map-preview-card"><img src="https://a.tile.openstreetmap.org/10/335/368.png" alt="Map"><span class="map-preview-name">Default</span></div>`;
+    let topoHtml = `<div class="map-preview-card"><img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/10/368/335" alt="Topo"><span class="map-preview-name">Terrain</span></div>`;
+    let satHtml = `<div class="map-preview-card"><img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/10/368/335" alt="Sat"><span class="map-preview-name">Satellite</span></div>`;
+
     // Add map layers control to UI
-    let baseMaps = {
-        "Standard Map": standardMap,
-        "Topographic Map": topoMap,
-        "Satellite Map": satelliteMap
-    };
-    L.control.layers(baseMaps).addTo(map);
+    let baseMaps = {};
+    baseMaps[standardHtml] = standardMap;
+    baseMaps[topoHtml] = topoMap;
+    baseMaps[satHtml] = satelliteMap;
+    
+    L.control.layers(baseMaps, null, { collapsed: false }).addTo(map);
 
     markersLayer = L.layerGroup().addTo(map);
     setupEventListeners();
