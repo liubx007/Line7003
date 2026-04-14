@@ -69,9 +69,9 @@ function initializeDashboard() {
     standardMap.addTo(map);
 
     // Create map preview labels (using static tile coordinates for preview images)
-    let standardHtml = `<div class="map-preview-card"><img src="https://a.tile.openstreetmap.org/10/335/368.png" alt="Map"><span class="map-preview-name">Default</span></div>`;
-    let topoHtml = `<div class="map-preview-card"><img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/10/368/335" alt="Topo"><span class="map-preview-name">Terrain</span></div>`;
-    let satHtml = `<div class="map-preview-card"><img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/10/368/335" alt="Sat"><span class="map-preview-name">Satellite</span></div>`;
+    let standardHtml = `<div class="map-preview-card"><img src="https://a.tile.openstreetmap.org/10/335/368.png" alt="Map"><div class="collapsed-badge"><i class="fa-solid fa-layer-group"></i> 图层</div><span class="map-preview-name">Default</span></div>`;
+    let topoHtml = `<div class="map-preview-card"><img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/10/368/335" alt="Topo"><div class="collapsed-badge"><i class="fa-solid fa-layer-group"></i> 图层</div><span class="map-preview-name">Terrain</span></div>`;
+    let satHtml = `<div class="map-preview-card"><img src="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/10/368/335" alt="Sat"><div class="collapsed-badge"><i class="fa-solid fa-layer-group"></i> 图层</div><span class="map-preview-name">Satellite</span></div>`;
 
     // Add map layers control to UI
     let baseMaps = {};
