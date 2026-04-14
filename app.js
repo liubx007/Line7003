@@ -596,11 +596,11 @@ function startTour() {
     const driverObj = driver({
         showProgress: true,
         steps: [
-            { element: '.leaflet-control-layers', popover: { title: 'Background Maps', description: 'Hover here to switch your map view between Default, Terrain, and Satellite.', side: "left", align: 'end' } },
-            { element: '#tourBtn', popover: { title: 'System Help', description: 'Need a refresher? Click this Help button anytime to replay this guided tour.', side: "bottom", align: 'end' } },
             { element: '#searchGroup', popover: { title: 'Search Poles', description: 'Quickly find a specific pole by typing its ID here.', side: "bottom", align: 'start' } },
             { element: '#filterGroup', popover: { title: 'Refine Data', description: 'Filter the visible poles by Wood Species and PCF Concentration.', side: "bottom", align: 'start' } },
-            { element: '#vizGroup', popover: { title: 'Map Visualizations', description: 'Toggle between Gradients, 3D Bars, and Heatmaps.', side: "bottom", align: 'start' } }
+            { element: '#vizGroup', popover: { title: 'Map Visualizations', description: 'Toggle between Gradients, 3D Bars, and Heatmaps.', side: "bottom", align: 'start' } },
+            { element: '.leaflet-control-layers', popover: { title: 'Background Maps', description: 'Hover here to switch your map view between Default, Terrain, and Satellite.', side: "left", align: 'end' } },
+            { element: '#tourBtn', popover: { title: 'System Help', description: 'Need a refresher? Click this Help button anytime to replay this guided tour.', side: "bottom", align: 'end' } }
         ]
     });
     driverObj.drive();
