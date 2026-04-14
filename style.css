@@ -419,6 +419,48 @@ input.leaflet-control-layers-selector:checked + span .map-preview-name {
     border-radius: 12px !important;
 }
 
+/* --- Force collapsed state during Driver.js tour highlight --- */
+.leaflet-control-layers.tour-locked .leaflet-control-layers-list label:not(:has(input:checked)) {
+    max-width: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    border-width: 0 !important;
+}
+.leaflet-control-layers.tour-locked .leaflet-control-layers-list label:not(:has(input:checked)) .map-preview-card img {
+    width: 0 !important;
+    border: 0 !important;
+}
+.leaflet-control-layers.tour-locked .leaflet-control-layers-base {
+    gap: 0 !important;
+}
+.leaflet-control-layers.tour-locked .map-preview-card {
+    padding: 2px !important;
+    border-color: transparent !important;
+    background: transparent !important;
+}
+.leaflet-control-layers.tour-locked .map-preview-card img {
+    margin-bottom: 0 !important;
+    width: 54px !important;
+    height: 54px !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+}
+.leaflet-control-layers.tour-locked input.leaflet-control-layers-selector:checked + span .map-preview-card img {
+    box-shadow: 0 1px 4px rgba(0,0,0,0.3) !important;
+}
+.leaflet-control-layers.tour-locked .map-preview-name {
+    opacity: 0 !important;
+    display: none !important;
+}
+.leaflet-control-layers.tour-locked .collapsed-badge {
+    display: flex !important;
+}
+.leaflet-control-layers.tour-locked {
+    padding: 4px !important;
+    border-radius: 12px !important;
+}
+
 /* --- Zoom Controls (Glassmorphism) --- */
 .leaflet-bar {
     border: 1px solid var(--border-glass) !important;

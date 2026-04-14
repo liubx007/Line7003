@@ -620,9 +620,20 @@ function startTour() {
         showProgress: true,
         nextBtnText: 'Skip',
         doneBtnText: 'Skip',
-        allowClose: false, // Prevent standard overlay exit so our custom handler dictates all
+        allowClose: false,
+        onHighlightStarted: (el) => {
+            // Lock collapsed state when layer control is highlighted
+            const layerCtrl = document.querySelector('.leaflet-control-layers');
+            if (layerCtrl) layerCtrl.classList.add('tour-locked');
+        },
+        onDeselected: () => {
+            const layerCtrl = document.querySelector('.leaflet-control-layers');
+            if (layerCtrl) layerCtrl.classList.remove('tour-locked');
+        },
         onDestroyStarted: () => {
             document.removeEventListener('click', handleTourClick, true);
+            const layerCtrl = document.querySelector('.leaflet-control-layers');
+            if (layerCtrl) layerCtrl.classList.remove('tour-locked');
             driverObj.destroy();
         },
         steps: [
