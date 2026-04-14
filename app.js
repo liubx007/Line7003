@@ -51,9 +51,30 @@ function initializeDashboard() {
 
     // Add preferCanvas: true for massive performance gains with 1000s of markers
     map = L.map('map', { preferCanvas: true }).setView([45.5, -62.0], 9);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    
+    // Define tile layers for Leaflet
+    let standardMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
-    }).addTo(map);
+    });
+    
+    let topoMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri', maxZoom: 19
+    });
+    
+    let satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; Esri', maxZoom: 19
+    });
+
+    // Add default map layer
+    standardMap.addTo(map);
+
+    // Add map layers control to UI
+    let baseMaps = {
+        "Standard Map": standardMap,
+        "Topographic Map": topoMap,
+        "Satellite Map": satelliteMap
+    };
+    L.control.layers(baseMaps).addTo(map);
 
     markersLayer = L.layerGroup().addTo(map);
     setupEventListeners();
