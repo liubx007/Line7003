@@ -344,13 +344,13 @@ input.leaflet-control-layers-selector {
     right: 2px;
     background: rgba(30, 41, 59, 0.85);
     color: white;
-    font-size: 9.5px;
+    font-size: 10px;
     padding: 3px 0;
     border-radius: 0 0 6px 6px;
     display: none;
     align-items: center;
     justify-content: center;
-    gap: 3px;
+    gap: 4px;
     pointer-events: none;
     backdrop-filter: blur(2px);
     font-weight: 500;
@@ -371,6 +371,13 @@ input.leaflet-control-layers-selector:checked + span .map-preview-name {
 }
 
 /* --- Collapsible Mechanism via CSS --- */
+/* Bottom-right alignment to match bottom edge of Data Summary */
+.leaflet-bottom.leaflet-right .leaflet-control-layers {
+    position: absolute !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    margin: 0 !important;
+}
 .leaflet-control-layers:not(:hover) .leaflet-control-layers-list label:not(:has(input:checked)) {
     max-width: 0 !important;
     opacity: 0 !important;
@@ -391,8 +398,8 @@ input.leaflet-control-layers-selector:checked + span .map-preview-name {
 }
 .leaflet-control-layers:not(:hover) .map-preview-card img {
     margin-bottom: 0 !important;
-    width: 48px !important;
-    height: 48px !important;
+    width: 54px !important;
+    height: 54px !important;
     border: none !important;
     box-shadow: none !important;
     border-radius: 6px !important;
